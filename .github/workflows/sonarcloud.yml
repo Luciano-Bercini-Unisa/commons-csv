@@ -1,5 +1,6 @@
 name: SonarCloud Analysis
 on:
+  workflow_dispatch:  # Allows manual triggering of this workflow
   push:
     branches:
       - main
