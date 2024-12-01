@@ -30,14 +30,14 @@ import org.junit.jupiter.api.Test;
 /**
  * Test {@link ExtendedBufferedReader}.
  */
-public class ExtendedBufferedReaderTest {
+ class ExtendedBufferedReaderTest {
 
     private ExtendedBufferedReader createBufferedReader(final String s) {
         return new ExtendedBufferedReader(new StringReader(s));
     }
 
     @Test
-    public void testEmptyInput() throws Exception {
+     void testEmptyInput() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("")) {
             assertEquals(EOF, br.read());
             assertEquals(EOF, br.peek());
@@ -51,7 +51,7 @@ public class ExtendedBufferedReaderTest {
      * Test to illustrate https://issues.apache.org/jira/browse/CSV-75
      */
     @Test
-    public void testReadChar() throws Exception {
+     void testReadChar() throws Exception {
         final String LF = "\n";
         final String CR = "\r";
         final String CRLF = CR + LF;
@@ -91,7 +91,7 @@ public class ExtendedBufferedReaderTest {
     }
 
     @Test
-    public void testReadingInDifferentBuffer() throws Exception {
+     void testReadingInDifferentBuffer() throws Exception {
         final char[] tmp1 = new char[2], tmp2 = new char[4];
         try (ExtendedBufferedReader reader = createBufferedReader("1\r\n2\r\n")) {
             reader.read(tmp1, 0, 2);
@@ -101,7 +101,7 @@ public class ExtendedBufferedReaderTest {
     }
 
     @Test
-    public void testReadLine() throws Exception {
+     void testReadLine() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("")) {
             assertNull(br.readLine());
         }
@@ -144,7 +144,7 @@ public class ExtendedBufferedReaderTest {
     }
 
     @Test
-    public void testReadLookahead1() throws Exception {
+     void testReadLookahead1() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("1\n2\r3\n")) {
             assertEquals(0, br.getLineNumber());
             assertEquals('1', br.peek());
@@ -203,7 +203,7 @@ public class ExtendedBufferedReaderTest {
     }
 
     @Test
-    public void testReadLookahead2() throws Exception {
+     void testReadLookahead2() throws Exception {
         final char[] ref = new char[5];
         final char[] res = new char[5];
 

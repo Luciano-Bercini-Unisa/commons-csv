@@ -38,11 +38,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Parse tests using test files
  */
-public class CSVFileParserTest {
+class CSVFileParserTest {
 
     private static final File BASE_DIR = new File("src/test/resources/org/apache/commons/csv/CSVFileParser");
 
-    public static Stream<File> generateData() {
+    static Stream<File> generateData() {
         final File[] files = BASE_DIR.listFiles((dir, name) -> name.startsWith("test") && name.endsWith(".txt"));
         return files != null ? Stream.of(files) : Stream.empty();
     }
@@ -57,7 +57,7 @@ public class CSVFileParserTest {
 
     @ParameterizedTest
     @MethodSource("generateData")
-    public void testCSVFile(final File testFile) throws Exception {
+    void testCSVFile(final File testFile) throws Exception {
         try (FileReader fr = new FileReader(testFile); BufferedReader testDataReader = new BufferedReader(fr)) {
             String line = readTestData(testDataReader);
             assertNotNull("file must contain config line", line);
@@ -102,7 +102,7 @@ public class CSVFileParserTest {
 
     @ParameterizedTest
     @MethodSource("generateData")
-    public void testCSVUrl(final File testFile) throws Exception {
+    void testCSVUrl(final File testFile) throws Exception {
         try (FileReader fr = new FileReader(testFile); BufferedReader testData = new BufferedReader(fr)) {
             String line = readTestData(testData);
             assertNotNull("file must contain config line", line);

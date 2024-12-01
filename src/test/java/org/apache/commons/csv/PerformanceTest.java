@@ -42,7 +42,7 @@ import org.apache.commons.io.IOUtils;
  * Basic test harness.
  */
 @SuppressWarnings("boxing")
-public class PerformanceTest {
+ class PerformanceTest {
 
     @FunctionalInterface
     private interface CSVParserFactory {
@@ -112,7 +112,7 @@ public class PerformanceTest {
         return new Stats(count, fields);
     }
 
-    public static void main(final String[] args) throws Exception {
+     static void main(final String[] args) throws Exception {
         if (BIG_FILE.exists()) {
             System.out.printf("Found test fixture %s: %,d bytes.%n", BIG_FILE, BIG_FILE.length());
         } else {

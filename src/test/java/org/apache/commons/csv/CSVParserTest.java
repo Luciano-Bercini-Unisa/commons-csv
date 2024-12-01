@@ -63,11 +63,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 /**
  * CSVParserTest
- *
+ * <p>
  * The test are organized in three different sections: The 'setter/getter' section, the lexer section and finally the parser section. In case a test fails, you
  * should follow a top-down approach for fixing a potential bug (its likely that the parser itself fails if the lexer has problems...).
  */
-public class CSVParserTest {
+class CSVParserTest {
 
     private static final CSVFormat EXCEL_WITH_HEADER = CSVFormat.EXCEL.withHeader();
 
@@ -83,7 +83,7 @@ public class CSVParserTest {
 
     private static final String CSV_INPUT_2 = "a,b,1 2";
 
-    private static final String[][] RESULT = { { "a", "b", "c", "d" }, { "a", "b", "1 2" }, { "foo baar", "b", "" }, { "foo\n,,\n\",,\n\"", "d", "e" } };
+    private static final String[][] RESULT = {{"a", "b", "c", "d"}, {"a", "b", "1 2"}, {"foo baar", "b", ""}, {"foo\n,,\n\",,\n\"", "d", "e"}};
 
     // CSV with no header comments
     static private final String CSV_INPUT_NO_COMMENT = "A,B" + CRLF + "1,2" + CRLF;
@@ -136,7 +136,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testBackslashEscaping() throws IOException {
+    void testBackslashEscaping() throws IOException {
         // To avoid confusion over the need for escaping chars in java code,
         // We will test with a forward slash as the escape char, and a single
         // quote as the encapsulator.
@@ -172,7 +172,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testBackslashEscaping2() throws IOException {
+    void testBackslashEscaping2() throws IOException {
         // To avoid confusion over the need for escaping chars in java code,
         // We will test with a forward slash as the escape char, and a single
         // quote as the encapsulator.
@@ -196,17 +196,17 @@ public class CSVParserTest {
 
     @Test
     @Disabled
-    public void testBackslashEscapingOld() throws IOException {
+    void testBackslashEscapingOld() throws IOException {
         final String code = "one,two,three\n" + "on\\\"e,two\n" + "on\"e,two\n" + "one,\"tw\\\"o\"\n" + "one,\"t\\,wo\"\n" + "one,two,\"th,ree\"\n" +
                 "\"a\\\\\"\n" + "a\\,b\n" + "\"a\\\\,b\"";
-        final String[][] res = { { "one", "two", "three" }, { "on\\\"e", "two" }, { "on\"e", "two" }, { "one", "tw\"o" }, { "one", "t\\,wo" }, // backslash in
-                                                                                                                                               // quotes only
-                                                                                                                                               // escapes a
-                                                                                                                                               // delimiter
-                                                                                                                                               // (",")
-                { "one", "two", "th,ree" }, { "a\\\\" }, // backslash in quotes only escapes a delimiter (",")
-                { "a\\", "b" }, // a backslash must be returned
-                { "a\\\\,b" } // backslash in quotes only escapes a delimiter (",")
+        final String[][] res = {{"one", "two", "three"}, {"on\\\"e", "two"}, {"on\"e", "two"}, {"one", "tw\"o"}, {"one", "t\\,wo"}, // backslash in
+                // quotes only
+                // escapes a
+                // delimiter
+                // (",")
+                {"one", "two", "th,ree"}, {"a\\\\"}, // backslash in quotes only escapes a delimiter (",")
+                {"a\\", "b"}, // a backslash must be returned
+                {"a\\\\,b"} // backslash in quotes only escapes a delimiter (",")
         };
         try (final CSVParser parser = CSVParser.parse(code, CSVFormat.DEFAULT)) {
             final List<CSVRecord> records = parser.getRecords();
@@ -220,7 +220,7 @@ public class CSVParserTest {
 
     @Test
     @Disabled("CSV-107")
-    public void testBOM() throws IOException {
+    void testBOM() throws IOException {
         final URL url = ClassLoader.getSystemClassLoader().getResource("org/apache/commons/csv/CSVFileParser/bom.csv");
         try (final CSVParser parser = CSVParser.parse(url, StandardCharsets.UTF_8, EXCEL_WITH_HEADER)) {
             parser.forEach(record -> assertNotNull(record.get("Date")));
@@ -228,37 +228,37 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testBOMInputStreamParserWithInputStream() throws IOException {
+    void testBOMInputStreamParserWithInputStream() throws IOException {
         try (final BOMInputStream inputStream = createBOMInputStream("org/apache/commons/csv/CSVFileParser/bom.csv");
-                final CSVParser parser = CSVParser.parse(inputStream, UTF_8, EXCEL_WITH_HEADER)) {
+             final CSVParser parser = CSVParser.parse(inputStream, UTF_8, EXCEL_WITH_HEADER)) {
             parser.forEach(record -> assertNotNull(record.get("Date")));
         }
     }
 
     @Test
-    public void testBOMInputStreamParserWithReader() throws IOException {
+    void testBOMInputStreamParserWithReader() throws IOException {
         try (final Reader reader = new InputStreamReader(createBOMInputStream("org/apache/commons/csv/CSVFileParser/bom.csv"), UTF_8_NAME);
-                final CSVParser parser = CSVParser.builder()
-                        .setReader(reader)
-                        .setFormat(EXCEL_WITH_HEADER)
-                        .get()) {
+             final CSVParser parser = CSVParser.builder()
+                     .setReader(reader)
+                     .setFormat(EXCEL_WITH_HEADER)
+                     .get()) {
             parser.forEach(record -> assertNotNull(record.get("Date")));
         }
     }
 
     @Test
-    public void testBOMInputStreamParseWithReader() throws IOException {
+    void testBOMInputStreamParseWithReader() throws IOException {
         try (final Reader reader = new InputStreamReader(createBOMInputStream("org/apache/commons/csv/CSVFileParser/bom.csv"), UTF_8_NAME);
-                final CSVParser parser = CSVParser.builder()
-                        .setReader(reader)
-                        .setFormat(EXCEL_WITH_HEADER)
-                        .get()) {
+             final CSVParser parser = CSVParser.builder()
+                     .setReader(reader)
+                     .setFormat(EXCEL_WITH_HEADER)
+                     .get()) {
             parser.forEach(record -> assertNotNull(record.get("Date")));
         }
     }
 
     @Test
-    public void testCarriageReturnEndings() throws IOException {
+    void testCarriageReturnEndings() throws IOException {
         final String string = "foo\rbaar,\rhello,world\r,kanu";
         try (final CSVParser parser = CSVParser.builder().setCharSequence(string).get()) {
             final List<CSVRecord> records = parser.getRecords();
@@ -267,7 +267,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testCarriageReturnLineFeedEndings() throws IOException {
+    void testCarriageReturnLineFeedEndings() throws IOException {
         final String string = "foo\r\nbaar,\r\nhello,world\r\n,kanu";
         try (final CSVParser parser = CSVParser.builder().setCharSequence(string).get()) {
             final List<CSVRecord> records = parser.getRecords();
@@ -276,7 +276,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testClose() throws Exception {
+    void testClose() throws Exception {
         final Reader in = new StringReader("# comment\na,b,c\n1,2,3\nx,y,z");
         final Iterator<CSVRecord> records;
         try (final CSVParser parser = CSVFormat.DEFAULT.withCommentMarker('#').withHeader().parse(in)) {
@@ -288,32 +288,32 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testCSV141CSVFormat_DEFAULT() throws Exception {
+    void testCSV141CSVFormat_DEFAULT() throws Exception {
         testCSV141Failure(CSVFormat.DEFAULT, 3);
     }
 
     @Test
-    public void testCSV141CSVFormat_INFORMIX_UNLOAD() throws Exception {
+    void testCSV141CSVFormat_INFORMIX_UNLOAD() throws Exception {
         testCSV141Failure(CSVFormat.INFORMIX_UNLOAD, 1);
     }
 
     @Test
-    public void testCSV141CSVFormat_INFORMIX_UNLOAD_CSV() throws Exception {
+    void testCSV141CSVFormat_INFORMIX_UNLOAD_CSV() throws Exception {
         testCSV141Failure(CSVFormat.INFORMIX_UNLOAD_CSV, 3);
     }
 
     @Test
-    public void testCSV141CSVFormat_ORACLE() throws Exception {
+    void testCSV141CSVFormat_ORACLE() throws Exception {
         testCSV141Failure(CSVFormat.ORACLE, 2);
     }
 
     @Test
-    public void testCSV141CSVFormat_POSTGRESQL_CSV() throws Exception {
+    void testCSV141CSVFormat_POSTGRESQL_CSV() throws Exception {
         testCSV141Failure(CSVFormat.POSTGRESQL_CSV, 3);
     }
 
     @Test
-    public void testCSV141Excel() throws Exception {
+    void testCSV141Excel() throws Exception {
         testCSV141Ok(CSVFormat.EXCEL);
     }
 
@@ -383,12 +383,12 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testCSV141RFC4180() throws Exception {
+    void testCSV141RFC4180() throws Exception {
         testCSV141Failure(CSVFormat.RFC4180, 3);
     }
 
     @Test
-    public void testCSV235() throws IOException {
+    void testCSV235() throws IOException {
         final String dqString = "\"aaa\",\"b\"\"bb\",\"ccc\""; // "aaa","b""bb","ccc"
         try (final CSVParser parser = CSVFormat.RFC4180.parse(new StringReader(dqString))) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -402,7 +402,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testCSV57() throws Exception {
+    void testCSV57() throws Exception {
         try (final CSVParser parser = CSVParser.parse("", CSVFormat.DEFAULT)) {
             final List<CSVRecord> list = parser.getRecords();
             assertNotNull(list);
@@ -411,7 +411,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testDefaultFormat() throws IOException {
+    void testDefaultFormat() throws IOException {
         // @formatter:off
         final String code = "" + "a,b#\n" + // 1)
             "\"\n\",\" \",#\n" +            // 2)
@@ -419,10 +419,10 @@ public class CSVParserTest {
             "# Final comment\n"             // 4)
         ;
         // @formatter:on
-        final String[][] res = { { "a", "b#" }, { "\n", " ", "#" }, { "#", "" }, { "# Final comment" } };
+        final String[][] res = {{"a", "b#"}, {"\n", " ", "#"}, {"#", ""}, {"# Final comment"}};
         CSVFormat format = CSVFormat.DEFAULT;
         assertFalse(format.isCommentMarkerSet());
-        final String[][] res_comments = { { "a", "b#" }, { "\n", " ", "#" } };
+        final String[][] res_comments = {{"a", "b#"}, {"\n", " ", "#"}};
         try (final CSVParser parser = CSVParser.parse(code, format)) {
             final List<CSVRecord> records = parser.getRecords();
             assertFalse(records.isEmpty());
@@ -436,20 +436,20 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testDuplicateHeadersAllowedByDefault() throws Exception {
+    void testDuplicateHeadersAllowedByDefault() throws Exception {
         try (CSVParser parser = CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader())) {
             // noop
         }
     }
 
     @Test
-    public void testDuplicateHeadersNotAllowed() {
+    void testDuplicateHeadersNotAllowed() {
         assertThrows(IllegalArgumentException.class,
                 () -> CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader().withAllowDuplicateHeaderNames(false)));
     }
 
     @Test
-    public void testEmptyFile() throws Exception {
+    void testEmptyFile() throws Exception {
         try (final CSVParser parser = CSVParser.parse(Paths.get("src/test/resources/org/apache/commons/csv/empty.txt"), StandardCharsets.UTF_8,
                 CSVFormat.DEFAULT)) {
             assertNull(parser.nextRecord());
@@ -457,7 +457,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testEmptyFileHeaderParsing() throws Exception {
+    void testEmptyFileHeaderParsing() throws Exception {
         try (final CSVParser parser = CSVParser.parse("", CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
             assertNull(parser.nextRecord());
             assertTrue(parser.getHeaderNames().isEmpty());
@@ -465,9 +465,9 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testEmptyLineBehaviorCSV() throws Exception {
-        final String[] codes = { "hello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n" };
-        final String[][] res = { { "hello", "" } // CSV format ignores empty lines
+    void testEmptyLineBehaviorCSV() throws Exception {
+        final String[] codes = {"hello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n"};
+        final String[][] res = {{"hello", ""} // CSV format ignores empty lines
         };
         for (final String code : codes) {
             try (final CSVParser parser = CSVParser.parse(code, CSVFormat.DEFAULT)) {
@@ -482,10 +482,10 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testEmptyLineBehaviorExcel() throws Exception {
-        final String[] codes = { "hello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n" };
-        final String[][] res = { { "hello", "" }, { "" }, // Excel format does not ignore empty lines
-                { "" } };
+    void testEmptyLineBehaviorExcel() throws Exception {
+        final String[] codes = {"hello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n"};
+        final String[][] res = {{"hello", ""}, {""}, // Excel format does not ignore empty lines
+                {""}};
         for (final String code : codes) {
             try (final CSVParser parser = CSVParser.parse(code, CSVFormat.EXCEL)) {
                 final List<CSVRecord> records = parser.getRecords();
@@ -499,18 +499,18 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testEmptyString() throws Exception {
+    void testEmptyString() throws Exception {
         try (final CSVParser parser = CSVParser.parse("", CSVFormat.DEFAULT)) {
             assertNull(parser.nextRecord());
         }
     }
 
     @Test
-    public void testEndOfFileBehaviorCSV() throws Exception {
-        final String[] codes = { "hello,\r\n\r\nworld,\r\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\r\n", "hello,\r\n\r\nworld,\"\"",
-                "hello,\r\n\r\nworld,\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\n", "hello,\r\n\r\nworld,\"\"" };
-        final String[][] res = { { "hello", "" }, // CSV format ignores empty lines
-                { "world", "" } };
+    void testEndOfFileBehaviorCSV() throws Exception {
+        final String[] codes = {"hello,\r\n\r\nworld,\r\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\r\n", "hello,\r\n\r\nworld,\"\"",
+                "hello,\r\n\r\nworld,\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\n", "hello,\r\n\r\nworld,\"\""};
+        final String[][] res = {{"hello", ""}, // CSV format ignores empty lines
+                {"world", ""}};
         for (final String code : codes) {
             try (final CSVParser parser = CSVParser.parse(code, CSVFormat.DEFAULT)) {
                 final List<CSVRecord> records = parser.getRecords();
@@ -524,11 +524,11 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testEndOfFileBehaviorExcel() throws Exception {
-        final String[] codes = { "hello,\r\n\r\nworld,\r\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\r\n", "hello,\r\n\r\nworld,\"\"",
-                "hello,\r\n\r\nworld,\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\n", "hello,\r\n\r\nworld,\"\"" };
-        final String[][] res = { { "hello", "" }, { "" }, // Excel format does not ignore empty lines
-                { "world", "" } };
+    void testEndOfFileBehaviorExcel() throws Exception {
+        final String[] codes = {"hello,\r\n\r\nworld,\r\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\r\n", "hello,\r\n\r\nworld,\"\"",
+                "hello,\r\n\r\nworld,\n", "hello,\r\n\r\nworld,", "hello,\r\n\r\nworld,\"\"\n", "hello,\r\n\r\nworld,\"\""};
+        final String[][] res = {{"hello", ""}, {""}, // Excel format does not ignore empty lines
+                {"world", ""}};
 
         for (final String code : codes) {
             try (final CSVParser parser = CSVParser.parse(code, CSVFormat.EXCEL)) {
@@ -543,10 +543,10 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testExcelFormat1() throws IOException {
+    void testExcelFormat1() throws IOException {
         final String code = "value1,value2,value3,value4\r\na,b,c,d\r\n  x,,," + "\r\n\r\n\"\"\"hello\"\"\",\"  \"\"world\"\"\",\"abc\ndef\",\r\n";
-        final String[][] res = { { "value1", "value2", "value3", "value4" }, { "a", "b", "c", "d" }, { "  x", "", "", "" }, { "" },
-                { "\"hello\"", "  \"world\"", "abc\ndef", "" } };
+        final String[][] res = {{"value1", "value2", "value3", "value4"}, {"a", "b", "c", "d"}, {"  x", "", "", ""}, {""},
+                {"\"hello\"", "  \"world\"", "abc\ndef", ""}};
         try (final CSVParser parser = CSVParser.parse(code, CSVFormat.EXCEL)) {
             final List<CSVRecord> records = parser.getRecords();
             assertEquals(res.length, records.size());
@@ -558,9 +558,9 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testExcelFormat2() throws Exception {
+    void testExcelFormat2() throws Exception {
         final String code = "foo,baar\r\n\r\nhello,\r\n\r\nworld,\r\n";
-        final String[][] res = { { "foo", "baar" }, { "" }, { "hello", "" }, { "" }, { "world", "" } };
+        final String[][] res = {{"foo", "baar"}, {""}, {"hello", ""}, {""}, {"world", ""}};
         try (final CSVParser parser = CSVParser.parse(code, CSVFormat.EXCEL)) {
             final List<CSVRecord> records = parser.getRecords();
             assertEquals(res.length, records.size());
@@ -575,7 +575,7 @@ public class CSVParserTest {
      * Tests an exported Excel worksheet with a header row and rows that have more columns than the headers
      */
     @Test
-    public void testExcelHeaderCountLessThanData() throws Exception {
+    void testExcelHeaderCountLessThanData() throws Exception {
         final String code = "A,B,C,,\r\na,b,c,d,e\r\n";
         try (final CSVParser parser = CSVParser.parse(code, EXCEL_WITH_HEADER)) {
             parser.getRecords().forEach(record -> {
@@ -587,7 +587,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testFirstEndOfLineCr() throws IOException {
+    void testFirstEndOfLineCr() throws IOException {
         final String data = "foo\rbaar,\rhello,world\r,kanu";
         try (final CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT)) {
             final List<CSVRecord> records = parser.getRecords();
@@ -597,7 +597,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testFirstEndOfLineCrLf() throws IOException {
+    void testFirstEndOfLineCrLf() throws IOException {
         final String data = "foo\r\nbaar,\r\nhello,world\r\n,kanu";
         try (final CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT)) {
             final List<CSVRecord> records = parser.getRecords();
@@ -607,7 +607,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testFirstEndOfLineLf() throws IOException {
+    void testFirstEndOfLineLf() throws IOException {
         final String data = "foo\nbaar,\nhello,world\n,kanu";
         try (final CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT)) {
             final List<CSVRecord> records = parser.getRecords();
@@ -617,22 +617,22 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testForEach() throws Exception {
+    void testForEach() throws Exception {
         try (final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
-                final CSVParser parser = CSVFormat.DEFAULT.parse(in)) {
+             final CSVParser parser = CSVFormat.DEFAULT.parse(in)) {
             final List<CSVRecord> records = new ArrayList<>();
             for (final CSVRecord record : parser) {
                 records.add(record);
             }
             assertEquals(3, records.size());
-            assertArrayEquals(new String[] { "a", "b", "c" }, records.get(0).values());
-            assertArrayEquals(new String[] { "1", "2", "3" }, records.get(1).values());
-            assertArrayEquals(new String[] { "x", "y", "z" }, records.get(2).values());
+            assertArrayEquals(new String[]{"a", "b", "c"}, records.get(0).values());
+            assertArrayEquals(new String[]{"1", "2", "3"}, records.get(1).values());
+            assertArrayEquals(new String[]{"x", "y", "z"}, records.get(2).values());
         }
     }
 
     @Test
-    public void testGetHeaderComment_HeaderComment1() throws IOException {
+    void testGetHeaderComment_HeaderComment1() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_AUTO_HEADER)) {
             parser.getRecords();
             // Expect a header comment
@@ -642,7 +642,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderComment_HeaderComment2() throws IOException {
+    void testGetHeaderComment_HeaderComment2() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER)) {
             parser.getRecords();
             // Expect a header comment
@@ -652,7 +652,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderComment_HeaderComment3() throws IOException {
+    void testGetHeaderComment_HeaderComment3() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
             parser.getRecords();
             // Expect no header comment - the text "comment" is attached to the first record
@@ -662,7 +662,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderComment_HeaderTrailerComment() throws IOException {
+    void testGetHeaderComment_HeaderTrailerComment() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_MULTILINE_HEADER_TRAILER_COMMENT, FORMAT_AUTO_HEADER)) {
             parser.getRecords();
             // Expect a header comment
@@ -672,7 +672,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderComment_NoComment1() throws IOException {
+    void testGetHeaderComment_NoComment1() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, FORMAT_AUTO_HEADER)) {
             parser.getRecords();
             // Expect no header comment
@@ -682,7 +682,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderComment_NoComment2() throws IOException {
+    void testGetHeaderComment_NoComment2() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, FORMAT_EXPLICIT_HEADER)) {
             parser.getRecords();
             // Expect no header comment
@@ -692,7 +692,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderComment_NoComment3() throws IOException {
+    void testGetHeaderComment_NoComment3() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
             parser.getRecords();
             // Expect no header comment
@@ -702,7 +702,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderMap() throws Exception {
+    void testGetHeaderMap() throws Exception {
         try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
             final Map<String, Integer> headerMap = parser.getHeaderMap();
             final Iterator<String> columnNames = headerMap.keySet().iterator();
@@ -726,7 +726,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderNames() throws IOException {
+    void testGetHeaderNames() throws IOException {
         try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
             final Map<String, Integer> nameIndexMap = parser.getHeaderMap();
             final List<String> headerNames = parser.getHeaderNames();
@@ -740,7 +740,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetHeaderNamesReadOnly() throws IOException {
+    void testGetHeaderNamesReadOnly() throws IOException {
         try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
             final List<String> headerNames = parser.getHeaderNames();
             assertNotNull(headerNames);
@@ -749,7 +749,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetLine() throws IOException {
+    void testGetLine() throws IOException {
         try (final CSVParser parser = CSVParser.parse(CSV_INPUT, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
             for (final String[] re : RESULT) {
                 assertArrayEquals(re, parser.nextRecord().values());
@@ -760,22 +760,22 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetLineNumberWithCR() throws Exception {
+    void testGetLineNumberWithCR() throws Exception {
         validateLineNumbers(String.valueOf(CR));
     }
 
     @Test
-    public void testGetLineNumberWithCRLF() throws Exception {
+    void testGetLineNumberWithCRLF() throws Exception {
         validateLineNumbers(CRLF);
     }
 
     @Test
-    public void testGetLineNumberWithLF() throws Exception {
+    void testGetLineNumberWithLF() throws Exception {
         validateLineNumbers(String.valueOf(LF));
     }
 
     @Test
-    public void testGetOneLine() throws IOException {
+    void testGetOneLine() throws IOException {
         try (final CSVParser parser = CSVParser.parse(CSV_INPUT_1, CSVFormat.DEFAULT)) {
             final CSVRecord record = parser.getRecords().get(0);
             assertArrayEquals(RESULT[0], record.values());
@@ -788,13 +788,13 @@ public class CSVParserTest {
      * @throws IOException when an I/O error occurs.
      */
     @Test
-    public void testGetOneLineOneParser() throws IOException {
+    void testGetOneLineOneParser() throws IOException {
         final CSVFormat format = CSVFormat.DEFAULT;
         try (final PipedWriter writer = new PipedWriter();
-                final CSVParser parser = CSVParser.builder()
-                        .setReader(new PipedReader(writer))
-                        .setFormat(format)
-                        .get()) {
+             final CSVParser parser = CSVParser.builder()
+                     .setReader(new PipedReader(writer))
+                     .setFormat(format)
+                     .get()) {
             writer.append(CSV_INPUT_1);
             writer.append(format.getRecordSeparator());
             final CSVRecord record1 = parser.nextRecord();
@@ -807,32 +807,32 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetRecordNumberWithCR() throws Exception {
+    void testGetRecordNumberWithCR() throws Exception {
         validateRecordNumbers(String.valueOf(CR));
     }
 
     @Test
-    public void testGetRecordNumberWithCRLF() throws Exception {
+    void testGetRecordNumberWithCRLF() throws Exception {
         validateRecordNumbers(CRLF);
     }
 
     @Test
-    public void testGetRecordNumberWithLF() throws Exception {
+    void testGetRecordNumberWithLF() throws Exception {
         validateRecordNumbers(String.valueOf(LF));
     }
 
     @Test
-    public void testGetRecordPositionWithCRLF() throws Exception {
+    void testGetRecordPositionWithCRLF() throws Exception {
         validateRecordPosition(CRLF);
     }
 
     @Test
-    public void testGetRecordPositionWithLF() throws Exception {
+    void testGetRecordPositionWithLF() throws Exception {
         validateRecordPosition(String.valueOf(LF));
     }
 
     @Test
-    public void testGetRecords() throws IOException {
+    void testGetRecords() throws IOException {
         try (final CSVParser parser = CSVParser.parse(CSV_INPUT, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
             final List<CSVRecord> records = parser.getRecords();
             assertEquals(RESULT.length, records.size());
@@ -844,7 +844,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetRecordsFromBrokenInputStream() throws IOException {
+    void testGetRecordsFromBrokenInputStream() throws IOException {
         @SuppressWarnings("resource") // We also get an exception on close, which is OK but can't assert in a try.
         final CSVParser parser = CSVParser.parse(new BrokenInputStream(), UTF_8, CSVFormat.DEFAULT);
         assertThrows(UncheckedIOException.class, parser::getRecords);
@@ -852,7 +852,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetRecordWithMultiLineValues() throws Exception {
+    void testGetRecordWithMultiLineValues() throws Exception {
         try (final CSVParser parser = CSVParser.parse("\"a\r\n1\",\"a\r\n2\"" + CRLF + "\"b\r\n1\",\"b\r\n2\"" + CRLF + "\"c\r\n1\",\"c\r\n2\"",
                 CSVFormat.DEFAULT.withRecordSeparator(CRLF))) {
             CSVRecord record;
@@ -877,7 +877,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_HeaderComment1() throws IOException {
+    void testGetTrailerComment_HeaderComment1() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_AUTO_HEADER)) {
             parser.getRecords();
             assertFalse(parser.hasTrailerComment());
@@ -886,7 +886,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_HeaderComment2() throws IOException {
+    void testGetTrailerComment_HeaderComment2() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER)) {
             parser.getRecords();
             assertFalse(parser.hasTrailerComment());
@@ -895,7 +895,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_HeaderComment3() throws IOException {
+    void testGetTrailerComment_HeaderComment3() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
             parser.getRecords();
             assertFalse(parser.hasTrailerComment());
@@ -904,7 +904,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_HeaderTrailerComment1() throws IOException {
+    void testGetTrailerComment_HeaderTrailerComment1() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, FORMAT_AUTO_HEADER)) {
             parser.getRecords();
             assertTrue(parser.hasTrailerComment());
@@ -913,7 +913,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_HeaderTrailerComment2() throws IOException {
+    void testGetTrailerComment_HeaderTrailerComment2() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, FORMAT_EXPLICIT_HEADER)) {
             parser.getRecords();
             assertTrue(parser.hasTrailerComment());
@@ -922,7 +922,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_HeaderTrailerComment3() throws IOException {
+    void testGetTrailerComment_HeaderTrailerComment3() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
             parser.getRecords();
             assertTrue(parser.hasTrailerComment());
@@ -931,7 +931,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testGetTrailerComment_MultilineComment() throws IOException {
+    void testGetTrailerComment_MultilineComment() throws IOException {
         try (CSVParser parser = CSVParser.parse(CSV_INPUT_MULTILINE_HEADER_TRAILER_COMMENT, FORMAT_AUTO_HEADER)) {
             parser.getRecords();
             assertTrue(parser.hasTrailerComment());
@@ -940,7 +940,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testHeader() throws Exception {
+    void testHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
 
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(in)) {
@@ -959,7 +959,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testHeaderComment() throws Exception {
+    void testHeaderComment() throws Exception {
         final Reader in = new StringReader("# comment\na,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withCommentMarker('#').withHeader().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -975,7 +975,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testHeaderMissing() throws Exception {
+    void testHeaderMissing() throws Exception {
         final Reader in = new StringReader("a,,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -990,7 +990,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testHeaderMissingWithNull() throws Exception {
+    void testHeaderMissingWithNull() throws Exception {
         final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().withNullString("").withAllowMissingColumnNames().parse(in)) {
             parser.iterator();
@@ -998,41 +998,40 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testHeadersMissing() throws Exception {
+    void testHeadersMissing() throws Exception {
         try (final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-                final CSVParser parser = CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames().parse(in)) {
+             final CSVParser parser = CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames().parse(in)) {
             parser.iterator();
         }
     }
 
     @Test
-    public void testHeadersMissingException() {
+    void testHeadersMissingException() {
         final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
         assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.withHeader().parse(in).iterator());
     }
 
     @Test
-    public void testHeadersMissingOneColumnException() {
+    void testHeadersMissingOneColumnException() {
         final Reader in = new StringReader("a,,c,d,e\n1,2,3,4,5\nv,w,x,y,z");
         assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.withHeader().parse(in).iterator());
     }
 
     @Test
-    public void testHeadersWithNullColumnName() throws IOException {
+    void testHeadersWithNullColumnName() throws IOException {
         final Reader in = new StringReader("header1,null,header3\n1,2,3\n4,5,6");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().withNullString("null").withAllowMissingColumnNames().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             // Expect the null header to be missing
-            @SuppressWarnings("resource")
-            final CSVParser recordParser = record.getParser();
+            @SuppressWarnings("resource") final CSVParser recordParser = record.getParser();
             assertEquals(Arrays.asList("header1", "header3"), recordParser.getHeaderNames());
             assertEquals(2, recordParser.getHeaderMap().size());
         }
     }
 
     @Test
-    public void testIgnoreCaseHeaderMapping() throws Exception {
+    void testIgnoreCaseHeaderMapping() throws Exception {
         final Reader reader = new StringReader("1,2,3");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("One", "TWO", "three").withIgnoreHeaderCase().parse(reader)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1044,7 +1043,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testIgnoreEmptyLines() throws IOException {
+    void testIgnoreEmptyLines() throws IOException {
         final String code = "\nfoo,baar\n\r\n,\n\n,world\r\n\n";
         // String code = "world\r\n\n";
         // String code = "foo;baar\r\n\r\nhello;\r\n\r\nworld;\r\n";
@@ -1055,30 +1054,30 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testInvalidFormat() {
+    void testInvalidFormat() {
         assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.withDelimiter(CR));
     }
 
     @Test
-    public void testIterator() throws Exception {
+    void testIterator() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.parse(in)) {
             final Iterator<CSVRecord> iterator = parser.iterator();
             assertTrue(iterator.hasNext());
             assertThrows(UnsupportedOperationException.class, iterator::remove);
-            assertArrayEquals(new String[] { "a", "b", "c" }, iterator.next().values());
-            assertArrayEquals(new String[] { "1", "2", "3" }, iterator.next().values());
+            assertArrayEquals(new String[]{"a", "b", "c"}, iterator.next().values());
+            assertArrayEquals(new String[]{"1", "2", "3"}, iterator.next().values());
             assertTrue(iterator.hasNext());
             assertTrue(iterator.hasNext());
             assertTrue(iterator.hasNext());
-            assertArrayEquals(new String[] { "x", "y", "z" }, iterator.next().values());
+            assertArrayEquals(new String[]{"x", "y", "z"}, iterator.next().values());
             assertFalse(iterator.hasNext());
             assertThrows(NoSuchElementException.class, iterator::next);
         }
     }
 
     @Test
-    public void testIteratorSequenceBreaking() throws IOException {
+    void testIteratorSequenceBreaking() throws IOException {
         final String fiveRows = "1\n2\n3\n4\n5\n";
         // Iterator hasNext() shouldn't break sequence
         try (CSVParser parser = CSVFormat.DEFAULT.parse(new StringReader(fiveRows))) {
@@ -1133,7 +1132,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testLineFeedEndings() throws IOException {
+    void testLineFeedEndings() throws IOException {
         final String code = "foo\nbaar,\nhello,world\n,kanu";
         try (final CSVParser parser = CSVParser.parse(code, CSVFormat.DEFAULT)) {
             final List<CSVRecord> records = parser.getRecords();
@@ -1142,7 +1141,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testMappedButNotSetAsOutlook2007ContactExport() throws Exception {
+    void testMappedButNotSetAsOutlook2007ContactExport() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("A", "B", "C").withSkipHeaderRecord().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1177,7 +1176,7 @@ public class CSVParserTest {
 
     @Test
     @Disabled
-    public void testMongoDbCsv() throws Exception {
+    void testMongoDbCsv() throws Exception {
         try (final CSVParser parser = CSVParser.parse("\"a a\",b,c" + LF + "d,e,f", CSVFormat.MONGODB_CSV)) {
             final Iterator<CSVRecord> itr1 = parser.iterator();
             final Iterator<CSVRecord> itr2 = parser.iterator();
@@ -1195,8 +1194,8 @@ public class CSVParserTest {
     }
 
     @Test
-    // TODO this may lead to strange behavior, throw an exception if iterator() has already been called?
-    public void testMultipleIterators() throws Exception {
+        // TODO this may lead to strange behavior, throw an exception if iterator() has already been called?
+    void testMultipleIterators() throws Exception {
         try (final CSVParser parser = CSVParser.parse("a,b,c" + CRLF + "d,e,f", CSVFormat.DEFAULT)) {
             final Iterator<CSVRecord> itr1 = parser.iterator();
 
@@ -1213,24 +1212,24 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testNewCSVParserNullReaderFormat() {
+    void testNewCSVParserNullReaderFormat() {
         assertThrows(NullPointerException.class, () -> new CSVParser(null, CSVFormat.DEFAULT));
     }
 
     @Test
-    public void testNewCSVParserReaderNullFormat() {
+    void testNewCSVParserReaderNullFormat() {
         assertThrows(NullPointerException.class, () -> new CSVParser(new StringReader(""), null));
     }
 
     @Test
-    public void testNoHeaderMap() throws Exception {
+    void testNoHeaderMap() throws Exception {
         try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT)) {
             assertNull(parser.getHeaderMap());
         }
     }
 
     @Test
-    public void testNotValueCSV() throws IOException {
+    void testNotValueCSV() throws IOException {
         final String source = "#";
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withCommentMarker('#');
         try (final CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
@@ -1240,7 +1239,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParse() throws Exception {
+    void testParse() throws Exception {
         final ClassLoader loader = ClassLoader.getSystemClassLoader();
         final URL url = loader.getResource("org/apache/commons/csv/CSVFileParser/test.csv");
         final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader("A", "B", "C", "D").get();
@@ -1308,47 +1307,47 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParseFileNullFormat() {
+    void testParseFileNullFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse(new File("CSVFileParser/test.csv"), Charset.defaultCharset(), null));
     }
 
     @Test
-    public void testParseNullFileFormat() {
+    void testParseNullFileFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse((File) null, Charset.defaultCharset(), CSVFormat.DEFAULT));
     }
 
     @Test
-    public void testParseNullPathFormat() {
+    void testParseNullPathFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse((Path) null, Charset.defaultCharset(), CSVFormat.DEFAULT));
     }
 
     @Test
-    public void testParseNullStringFormat() {
+    void testParseNullStringFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse((String) null, CSVFormat.DEFAULT));
     }
 
     @Test
-    public void testParseNullUrlCharsetFormat() {
+    void testParseNullUrlCharsetFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse((URL) null, Charset.defaultCharset(), CSVFormat.DEFAULT));
     }
 
     @Test
-    public void testParserUrlNullCharsetFormat() {
+    void testParserUrlNullCharsetFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse(new URL("https://commons.apache.org"), null, CSVFormat.DEFAULT));
     }
 
     @Test
-    public void testParseStringNullFormat() {
+    void testParseStringNullFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse("csv data", (CSVFormat) null));
     }
 
     @Test
-    public void testParseUrlCharsetNullFormat() {
+    void testParseUrlCharsetNullFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.parse(new URL("https://commons.apache.org"), Charset.defaultCharset(), null));
     }
 
     @Test
-    public void testParseWithDelimiterStringWithEscape() throws IOException {
+    void testParseWithDelimiterStringWithEscape() throws IOException {
         final String source = "a![!|!]b![|]c[|]xyz\r\nabc[abc][|]xyz";
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter("[|]").setEscape('!').get();
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
@@ -1362,7 +1361,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParseWithDelimiterStringWithQuote() throws IOException {
+    void testParseWithDelimiterStringWithQuote() throws IOException {
         final String source = "'a[|]b[|]c'[|]xyz\r\nabc[abc][|]xyz";
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter("[|]").setQuote('\'').get();
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
@@ -1376,7 +1375,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParseWithDelimiterWithEscape() throws IOException {
+    void testParseWithDelimiterWithEscape() throws IOException {
         final String source = "a!,b!,c,xyz";
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withEscape('!');
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
@@ -1387,7 +1386,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParseWithDelimiterWithQuote() throws IOException {
+    void testParseWithDelimiterWithQuote() throws IOException {
         final String source = "'a,b,c',xyz";
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withQuote('\'');
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
@@ -1398,7 +1397,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParseWithQuoteThrowsException() {
+    void testParseWithQuoteThrowsException() {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withQuote('\'');
         assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c','")).nextRecord());
         assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c'abc,xyz")).nextRecord());
@@ -1406,7 +1405,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testParseWithQuoteWithEscape() throws IOException {
+    void testParseWithQuoteWithEscape() throws IOException {
         final String source = "'a?,b?,c?d',xyz";
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withQuote('\'').withEscape('?');
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
@@ -1418,8 +1417,8 @@ public class CSVParserTest {
 
     @ParameterizedTest
     @EnumSource(CSVFormat.Predefined.class)
-    public void testParsingPrintedEmptyFirstColumn(final CSVFormat.Predefined format) throws Exception {
-        final String[][] lines = { { "a", "b" }, { "", "x" } };
+    void testParsingPrintedEmptyFirstColumn(final CSVFormat.Predefined format) throws Exception {
+        final String[][] lines = {{"a", "b"}, {"", "x"}};
         final StringWriter buf = new StringWriter();
         try (CSVPrinter printer = new CSVPrinter(buf, format.getFormat())) {
             printer.printRecords(Stream.of(lines));
@@ -1436,7 +1435,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testProvidedHeader() throws Exception {
+    void testProvidedHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
 
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("A", "B", "C").parse(in)) {
@@ -1459,7 +1458,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testProvidedHeaderAuto() throws Exception {
+    void testProvidedHeaderAuto() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
 
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(in)) {
@@ -1482,23 +1481,22 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testRepeatedHeadersAreReturnedInCSVRecordHeaderNames() throws IOException {
+    void testRepeatedHeadersAreReturnedInCSVRecordHeaderNames() throws IOException {
         final Reader in = new StringReader("header1,header2,header1\n1,2,3\n4,5,6");
         try (final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
-            @SuppressWarnings("resource")
-            final CSVParser recordParser = record.getParser();
+            @SuppressWarnings("resource") final CSVParser recordParser = record.getParser();
             assertEquals(Arrays.asList("header1", "header2", "header1"), recordParser.getHeaderNames());
         }
     }
 
     @Test
-    public void testRoundtrip() throws Exception {
+    void testRoundtrip() throws Exception {
         final StringWriter out = new StringWriter();
         final String data = "a,b,c\r\n1,2,3\r\nx,y,z\r\n";
         try (final CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT);
-                final CSVParser parse = CSVParser.parse(data, CSVFormat.DEFAULT)) {
+             final CSVParser parse = CSVParser.parse(data, CSVFormat.DEFAULT)) {
             for (final CSVRecord record : parse) {
                 printer.printRecord(record);
             }
@@ -1507,7 +1505,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testSkipAutoHeader() throws Exception {
+    void testSkipAutoHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1519,7 +1517,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testSkipHeaderOverrideDuplicateHeaders() throws Exception {
+    void testSkipHeaderOverrideDuplicateHeaders() throws Exception {
         final Reader in = new StringReader("a,a,a\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1531,7 +1529,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testSkipSetAltHeaders() throws Exception {
+    void testSkipSetAltHeaders() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1543,7 +1541,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testSkipSetHeader() throws Exception {
+    void testSkipSetHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("a", "b", "c").withSkipHeaderRecord().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1556,10 +1554,10 @@ public class CSVParserTest {
 
     @Test
     @Disabled
-    public void testStartWithEmptyLinesThenHeaders() throws Exception {
-        final String[] codes = { "\r\n\r\n\r\nhello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n" };
-        final String[][] res = { { "hello", "" }, { "" }, // Excel format does not ignore empty lines
-                { "" } };
+    void testStartWithEmptyLinesThenHeaders() throws Exception {
+        final String[] codes = {"\r\n\r\n\r\nhello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n"};
+        final String[][] res = {{"hello", ""}, {""}, // Excel format does not ignore empty lines
+                {""}};
         for (final String code : codes) {
             try (final CSVParser parser = CSVParser.parse(code, CSVFormat.EXCEL)) {
                 final List<CSVRecord> records = parser.getRecords();
@@ -1573,19 +1571,19 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testStream() throws Exception {
+    void testStream() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.parse(in)) {
             final List<CSVRecord> list = parser.stream().collect(Collectors.toList());
             assertFalse(list.isEmpty());
-            assertArrayEquals(new String[] { "a", "b", "c" }, list.get(0).values());
-            assertArrayEquals(new String[] { "1", "2", "3" }, list.get(1).values());
-            assertArrayEquals(new String[] { "x", "y", "z" }, list.get(2).values());
+            assertArrayEquals(new String[]{"a", "b", "c"}, list.get(0).values());
+            assertArrayEquals(new String[]{"1", "2", "3"}, list.get(1).values());
+            assertArrayEquals(new String[]{"x", "y", "z"}, list.get(2).values());
         }
     }
 
     @Test
-    public void testThrowExceptionWithLineAndPosition() throws IOException {
+    void testThrowExceptionWithLineAndPosition() throws IOException {
         final String csvContent = "col1,col2,col3,col4,col5,col6,col7,col8,col9,col10\nrec1,rec2,rec3,rec4,rec5,rec6,rec7,rec8,\"\"rec9\"\",rec10";
         final StringReader stringReader = new StringReader(csvContent);
         // @formatter:off
@@ -1603,7 +1601,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testTrailingDelimiter() throws Exception {
+    void testTrailingDelimiter() throws Exception {
         final Reader in = new StringReader("a,a,a,\n\"1\",\"2\",\"3\",\nx,y,z,");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().withTrailingDelimiter().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
@@ -1616,7 +1614,7 @@ public class CSVParserTest {
     }
 
     @Test
-    public void testTrim() throws Exception {
+    void testTrim() throws Exception {
         final Reader in = new StringReader("a,a,a\n\" 1 \",\" 2 \",\" 3 \"\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().withTrim().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
