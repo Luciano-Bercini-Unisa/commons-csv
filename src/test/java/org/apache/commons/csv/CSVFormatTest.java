@@ -147,9 +147,29 @@ public class CSVFormatTest {
     }
 
     @Test
-    public void testDuplicateHeaderElementsTrue() {
-        CSVFormat.DEFAULT.builder().setAllowDuplicateHeaderNames(true).setHeader("A", "A").get();
+    public void testDuplicateHeaderModeIsAllowAll() {
+        // Build a CSVFormat with duplicate header names allowed
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setAllowDuplicateHeaderNames(true)
+                .setHeader("A", "A")
+                .get();
+
+        // Assert that the duplicateHeaderMode is set to ALLOW_ALL
+        assertEquals(DuplicateHeaderMode.ALLOW_ALL, format.getDuplicateHeaderMode(), "Duplicate header mode should be ALLOW_ALL");
     }
+
+    @Test
+    public void testHeadersAllowDuplicates() {
+        // Build a CSVFormat with duplicate header names allowed
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setAllowDuplicateHeaderNames(true)
+                .setHeader("A", "A")
+                .get();
+
+        // Assert that the headers are set correctly, even with duplicates
+        assertArrayEquals(new String[]{"A", "A"}, format.getHeader(), "Headers should allow duplicates");
+    }
+
 
     @SuppressWarnings("deprecation")
     @Test
