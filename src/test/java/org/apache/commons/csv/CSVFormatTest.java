@@ -21,15 +21,7 @@ import static org.apache.commons.csv.CSVFormat.RFC4180;
 import static org.apache.commons.csv.Constants.CR;
 import static org.apache.commons.csv.Constants.CRLF;
 import static org.apache.commons.csv.Constants.LF;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,13 +44,13 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link CSVFormat}.
  */
- class CSVFormatTest {
+class CSVFormatTest {
 
-     enum EmptyEnum {
+    enum EmptyEnum {
         // empty enum.
     }
 
-     enum Header {
+    enum Header {
         Name, Email, Phone
     }
 
@@ -79,44 +71,48 @@ import org.junit.jupiter.api.Test;
             fail("Hash code should not be equal for " + name + "(" + type + ")");
         }
     }
-    
+
     @Test
-     void testDelimiterEmptyStringThrowsException1() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter("").get());
+    void testDelimiterEmptyStringThrowsException1() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDelimiter("");
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testDelimiterSameAsCommentStartThrowsException1() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter('!').setCommentMarker('!').get());
+    void testDelimiterSameAsCommentStartThrowsException1() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDelimiter('!').setCommentMarker('!');
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testDelimiterSameAsEscapeThrowsException1() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter('!').setEscape('!').get());
+    void testDelimiterSameAsEscapeThrowsException1() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDelimiter('!').setEscape('!');
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testDelimiterSameAsRecordSeparatorThrowsException() {
+    void testDelimiterSameAsRecordSeparatorThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> CSVFormat.newFormat(CR));
     }
 
     @Test
-     void testDuplicateHeaderElements() {
-        final String[] header = { "A", "A" };
+    void testDuplicateHeaderElements() {
+        final String[] header = {"A", "A"};
         final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader(header).get();
         assertEquals(2, format.getHeader().length);
         assertArrayEquals(header, format.getHeader());
     }
-    
+
 
     @Test
-     void testDuplicateHeaderElementsFalse() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader("A", "A").get());
+    void testDuplicateHeaderElementsFalse() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader("A", "A");
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
 
     @Test
-     void testDuplicateHeaderElementsTrue() {
+    void testDuplicateHeaderElementsTrue() {
         // Build a CSVFormat with duplicate header names allowed
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL)
@@ -129,25 +125,25 @@ import org.junit.jupiter.api.Test;
         // Assert that the headers are set correctly, even with duplicates.
         assertArrayEquals(new String[]{"A", "A"}, format.getHeader(), "Headers should allow duplicates");
     }
-    
-    
+
+
     @Test
-     void testDuplicateHeaderElementsTrueContainsEmpty1() {
+    void testDuplicateHeaderElementsTrueContainsEmpty1() {
         CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader("A", "", "B", "").get();
     }
 
     @Test
-     void testDuplicateHeaderElementsTrueContainsEmpty2() {
+    void testDuplicateHeaderElementsTrueContainsEmpty2() {
         CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader("A", "", "B", "").get();
     }
 
     @Test
-     void testDuplicateHeaderElementsTrueContainsEmpty3() {
+    void testDuplicateHeaderElementsTrueContainsEmpty3() {
         CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setAllowMissingColumnNames(true).setHeader("A", "", "B", "").get();
     }
 
     @Test
-     void testEquals() {
+    void testEquals() {
         final CSVFormat right = CSVFormat.DEFAULT;
         final CSVFormat left = copy(right);
         Assertions.assertNotEquals(null, right);
@@ -160,15 +156,15 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testEqualsCommentStart() {
+    void testEqualsCommentStart() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setQuote('"').setCommentMarker('#').setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setCommentMarker('!').get();
 
         assertNotEquals(right, left);
     }
-    
+
     @Test
-     void testEqualsDelimiter() {
+    void testEqualsDelimiter() {
         final CSVFormat right = CSVFormat.newFormat('!');
         final CSVFormat left = CSVFormat.newFormat('?');
 
@@ -176,16 +172,16 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testEqualsEscape() {
+    void testEqualsEscape() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setQuote('"').setCommentMarker('#').setEscape('+').setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setEscape('!').get();
 
         assertNotEquals(right, left);
     }
-    
+
 
     @Test
-     void testEqualsHash() throws Exception {
+    void testEqualsHash() throws Exception {
         final Method[] methods = CSVFormat.class.getDeclaredMethods();
         for (final Method method : methods) {
             if (Modifier.isPublic(method.getModifiers())) {
@@ -194,61 +190,61 @@ import org.junit.jupiter.api.Test;
                     for (final Class<?> cls : method.getParameterTypes()) {
                         final String type = cls.getCanonicalName();
                         switch (type) {
-                        case "boolean": {
-                            final Object defTrue = method.invoke(CSVFormat.DEFAULT, Boolean.TRUE);
-                            final Object defFalse = method.invoke(CSVFormat.DEFAULT, Boolean.FALSE);
-                            assertNotEquals(name, type, defTrue, defFalse);
-                            break;
-                        }
-                        case "char": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, 'a');
-                            final Object b = method.invoke(CSVFormat.DEFAULT, 'b');
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        case "java.lang.Character": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, new Object[] { null });
-                            final Object b = method.invoke(CSVFormat.DEFAULT, Character.valueOf('d'));
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        case "java.lang.String": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, new Object[] { null });
-                            final Object b = method.invoke(CSVFormat.DEFAULT, "e");
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        case "java.lang.String[]": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, new Object[] { new String[] { null, null } });
-                            final Object b = method.invoke(CSVFormat.DEFAULT, new Object[] { new String[] { "f", "g" } });
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        case "org.apache.commons.csv.QuoteMode": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, QuoteMode.MINIMAL);
-                            final Object b = method.invoke(CSVFormat.DEFAULT, QuoteMode.ALL);
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        case "org.apache.commons.csv.DuplicateHeaderMode": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, DuplicateHeaderMode.ALLOW_ALL);
-                            final Object b = method.invoke(CSVFormat.DEFAULT, DuplicateHeaderMode.DISALLOW);
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        case "java.lang.Object[]": {
-                            final Object a = method.invoke(CSVFormat.DEFAULT, new Object[] { new Object[] { null, null } });
-                            final Object b = method.invoke(CSVFormat.DEFAULT, new Object[] { new Object[] { new Object(), new Object() } });
-                            assertNotEquals(name, type, a, b);
-                            break;
-                        }
-                        default:
-                            if ("withHeader".equals(name)) { // covered above by String[]
-                                // ignored
-                            } else {
-                                fail("Unhandled method: " + name + "(" + type + ")");
+                            case "boolean": {
+                                final Object defTrue = method.invoke(CSVFormat.DEFAULT, Boolean.TRUE);
+                                final Object defFalse = method.invoke(CSVFormat.DEFAULT, Boolean.FALSE);
+                                assertNotEquals(name, type, defTrue, defFalse);
+                                break;
                             }
-                            break;
+                            case "char": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, 'a');
+                                final Object b = method.invoke(CSVFormat.DEFAULT, 'b');
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            case "java.lang.Character": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, new Object[]{null});
+                                final Object b = method.invoke(CSVFormat.DEFAULT, Character.valueOf('d'));
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            case "java.lang.String": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, new Object[]{null});
+                                final Object b = method.invoke(CSVFormat.DEFAULT, "e");
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            case "java.lang.String[]": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, new Object[]{new String[]{null, null}});
+                                final Object b = method.invoke(CSVFormat.DEFAULT, new Object[]{new String[]{"f", "g"}});
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            case "org.apache.commons.csv.QuoteMode": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, QuoteMode.MINIMAL);
+                                final Object b = method.invoke(CSVFormat.DEFAULT, QuoteMode.ALL);
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            case "org.apache.commons.csv.DuplicateHeaderMode": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, DuplicateHeaderMode.ALLOW_ALL);
+                                final Object b = method.invoke(CSVFormat.DEFAULT, DuplicateHeaderMode.DISALLOW);
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            case "java.lang.Object[]": {
+                                final Object a = method.invoke(CSVFormat.DEFAULT, new Object[]{new Object[]{null, null}});
+                                final Object b = method.invoke(CSVFormat.DEFAULT, new Object[]{new Object[]{new Object(), new Object()}});
+                                assertNotEquals(name, type, a, b);
+                                break;
+                            }
+                            default:
+                                if ("withHeader".equals(name)) { // covered above by String[]
+                                    // ignored
+                                } else {
+                                    fail("Unhandled method: " + name + "(" + type + ")");
+                                }
+                                break;
                         }
                     }
                 }
@@ -257,7 +253,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testEqualsHeader() {
+    void testEqualsHeader() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setRecordSeparator(CR).setCommentMarker('#').setEscape('+').setHeader("One", "Two", "Three")
                 .setIgnoreEmptyLines(true).setIgnoreSurroundingSpaces(true).setQuote('"').setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setHeader("Three", "Two", "One").get();
@@ -266,54 +262,54 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testEqualsIgnoreEmptyLines() {
+    void testEqualsIgnoreEmptyLines() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setCommentMarker('#').setEscape('+').setIgnoreEmptyLines(true)
                 .setIgnoreSurroundingSpaces(true).setQuote('"').setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setIgnoreEmptyLines(false).get();
 
         assertNotEquals(right, left);
     }
-    
+
 
     @Test
-     void testEqualsIgnoreSurroundingSpaces() {
+    void testEqualsIgnoreSurroundingSpaces() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setCommentMarker('#').setEscape('+').setIgnoreSurroundingSpaces(true).setQuote('"')
                 .setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setIgnoreSurroundingSpaces(false).get();
 
         assertNotEquals(right, left);
     }
-    
+
     @Test
-     void testEqualsLeftNoQuoteRightQuote() {
+    void testEqualsLeftNoQuoteRightQuote() {
         final CSVFormat left = CSVFormat.newFormat(',').builder().setQuote(null).get();
         final CSVFormat right = left.builder().setQuote('#').get();
 
         assertNotEquals(left, right);
     }
-    
+
 
     @Test
-     void testEqualsNoQuotes() {
+    void testEqualsNoQuotes() {
         final CSVFormat left = CSVFormat.newFormat(',').builder().setQuote(null).get();
         final CSVFormat right = left.builder().setQuote(null).get();
 
         assertEquals(left, right);
     }
-    
+
 
     @Test
-     void testEqualsNullString() {
+    void testEqualsNullString() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setRecordSeparator(CR).setCommentMarker('#').setEscape('+').setIgnoreEmptyLines(true)
                 .setIgnoreSurroundingSpaces(true).setQuote('"').setQuoteMode(QuoteMode.ALL).setNullString("null").get();
         final CSVFormat left = right.builder().setNullString("---").get();
 
         assertNotEquals(right, left);
     }
-    
+
 
     @Test
-     void testEqualsOne() {
+    void testEqualsOne() {
 
         final CSVFormat csvFormatOne = CSVFormat.INFORMIX_UNLOAD;
         final CSVFormat csvFormatTwo = CSVFormat.MYSQL;
@@ -353,7 +349,7 @@ import org.junit.jupiter.api.Test;
         assertEquals(QuoteMode.ALL_NON_NULL, csvFormatTwo.getQuoteMode());
 
         assertEquals("\t", csvFormatTwo.getDelimiterString());
-        assertArrayEquals(new char[] { '\t' }, csvFormatTwo.getDelimiterCharArray());
+        assertArrayEquals(new char[]{'\t'}, csvFormatTwo.getDelimiterCharArray());
         assertEquals("\t", csvFormatTwo.getDelimiterString());
         assertEquals("\n", csvFormatTwo.getRecordSeparator());
 
@@ -443,44 +439,44 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testEqualsQuoteChar() {
+    void testEqualsQuoteChar() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setQuote('"').get();
         final CSVFormat left = right.builder().setQuote('!').get();
 
         assertNotEquals(right, left);
     }
-    
+
 
     @Test
-     void testEqualsQuotePolicy() {
+    void testEqualsQuotePolicy() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setQuote('"').setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setQuoteMode(QuoteMode.MINIMAL).get();
 
         assertNotEquals(right, left);
     }
-    
+
 
     @Test
-     void testEqualsRecordSeparator() {
+    void testEqualsRecordSeparator() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setRecordSeparator(CR).setCommentMarker('#').setEscape('+').setIgnoreEmptyLines(true)
                 .setIgnoreSurroundingSpaces(true).setQuote('"').setQuoteMode(QuoteMode.ALL).get();
         final CSVFormat left = right.builder().setRecordSeparator(LF).get();
 
         assertNotEquals(right, left);
     }
-    
 
-     void testEqualsSkipHeaderRecord() {
+
+    void testEqualsSkipHeaderRecord() {
         final CSVFormat right = CSVFormat.newFormat('\'').builder().setRecordSeparator(CR).setCommentMarker('#').setEscape('+').setIgnoreEmptyLines(true)
                 .setIgnoreSurroundingSpaces(true).setQuote('"').setQuoteMode(QuoteMode.ALL).setNullString("null").setSkipHeaderRecord(true).get();
         final CSVFormat left = right.builder().setSkipHeaderRecord(false).get();
 
         assertNotEquals(right, left);
     }
-    
+
 
     @Test
-     void testEqualsWithNull() {
+    void testEqualsWithNull() {
 
         final CSVFormat csvFormat = CSVFormat.POSTGRESQL_TEXT;
 
@@ -543,21 +539,22 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testEscapeSameAsCommentStartThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setEscape('!').setCommentMarker('!').get());
+    void testEscapeSameAsCommentStartThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setEscape('!').setCommentMarker('!');
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
 
     @Test
-     void testEscapeSameAsCommentStartThrowsExceptionForWrapperType() {
+    void testEscapeSameAsCommentStartThrowsExceptionForWrapperType() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setEscape(Character.valueOf('!')).setCommentMarker(Character.valueOf('!'));
         // Cannot assume that callers won't use different Character objects
-        assertThrows(IllegalArgumentException.class,
-                () -> CSVFormat.DEFAULT.builder().setEscape(Character.valueOf('!')).setCommentMarker(Character.valueOf('!')).get());
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
-    
+
 
     @Test
-     void testFormat() {
+    void testFormat() {
         final CSVFormat format = CSVFormat.DEFAULT;
 
         assertEquals("", format.format());
@@ -565,8 +562,9 @@ import org.junit.jupiter.api.Test;
         assertEquals("\"x,y\",z", format.format("x,y", "z"));
     }
 
-    @Test // I assume this to be a defect.
-     void testFormatThrowsNullPointerException() {
+    @Test
+        // I assume this to be a defect.
+    void testFormatThrowsNullPointerException() {
 
         final CSVFormat csvFormat = CSVFormat.MYSQL;
 
@@ -575,7 +573,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testFormatToString() {
+    void testFormatToString() {
         // @formatter:off
         final CSVFormat format = CSVFormat.RFC4180
                 .builder().setEscape('?').get()
@@ -595,16 +593,16 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testGetAllowDuplicateHeaderNames() {
+    void testGetAllowDuplicateHeaderNames() {
         final Builder builder = CSVFormat.DEFAULT.builder();
-        assertTrue(builder.get().getDuplicateHeaderMode() == DuplicateHeaderMode.ALLOW_ALL);
-        assertTrue(builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).get().getDuplicateHeaderMode() == DuplicateHeaderMode.ALLOW_ALL);
-        assertFalse(builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get().getDuplicateHeaderMode() == DuplicateHeaderMode.ALLOW_ALL);
-        assertFalse(builder.setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW).get().getDuplicateHeaderMode() == DuplicateHeaderMode.ALLOW_ALL);
+        assertSame(builder.get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
+        assertSame(builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
+        assertNotSame(builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
+        assertNotSame(builder.setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW).get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
     }
 
     @Test
-     void testGetDuplicateHeaderMode() {
+    void testGetDuplicateHeaderMode() {
         final Builder builder = CSVFormat.DEFAULT.builder();
 
         assertEquals(DuplicateHeaderMode.ALLOW_ALL, builder.get().getDuplicateHeaderMode());
@@ -614,8 +612,8 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testGetHeader() {
-        final String[] header = { "one", "two", "three" };
+    void testGetHeader() {
+        final String[] header = {"one", "two", "three"};
         final CSVFormat formatWithHeader = CSVFormat.DEFAULT.builder().setHeader(header).get();
         // getHeader() makes a copy of the header array.
         final String[] headerCopy = formatWithHeader.getHeader();
@@ -627,7 +625,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testHashCodeAndWithIgnoreHeaderCase() {
+    void testHashCodeAndWithIgnoreHeaderCase() {
 
         final CSVFormat csvFormat = CSVFormat.INFORMIX_UNLOAD_CSV;
         final CSVFormat csvFormatTwo = csvFormat.builder().setIgnoreHeaderCase(true).get();
@@ -645,13 +643,13 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testJiraCsv236() {
+    void testJiraCsv236() {
         CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).setHeader("CC", "VV", "VV").get();
     }
-    
+
 
     @Test
-     void testNewFormat() {
+    void testNewFormat() {
 
         final CSVFormat csvFormat = CSVFormat.newFormat('X');
 
@@ -712,16 +710,16 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testNullRecordSeparatorCsv106() {
+    void testNullRecordSeparatorCsv106() {
         final CSVFormat format = CSVFormat.newFormat(';').builder().setSkipHeaderRecord(true).setHeader("H1", "H2").get();
         final String formatStr = format.format("A", "B");
         assertNotNull(formatStr);
         assertFalse(formatStr.endsWith("null"));
     }
-    
+
 
     @Test
-     void testPrintRecord() throws IOException {
+    void testPrintRecord() throws IOException {
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180;
         format.printRecord(out, "a", "b", "c");
@@ -729,7 +727,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testPrintRecordEmpty() throws IOException {
+    void testPrintRecordEmpty() throws IOException {
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180;
         format.printRecord(out);
@@ -737,7 +735,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testPrintWithEscapesEndWithCRLF() throws IOException {
+    void testPrintWithEscapesEndWithCRLF() throws IOException {
         final Reader in = new StringReader("x,y,x\r\na,?b,c\r\n");
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180.builder().setEscape('?').get().builder().setDelimiter(',').get().builder().setQuote(null).get().builder().setRecordSeparator(CRLF).get();
@@ -746,7 +744,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testPrintWithEscapesEndWithoutCRLF() throws IOException {
+    void testPrintWithEscapesEndWithoutCRLF() throws IOException {
         final Reader in = new StringReader("x,y,x");
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180.builder().setEscape('?').get().builder().setDelimiter(',').get().builder().setQuote(null).get().builder().setRecordSeparator(CRLF).get();
@@ -755,7 +753,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testPrintWithoutQuotes() throws IOException {
+    void testPrintWithoutQuotes() throws IOException {
         final Reader in = new StringReader("");
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180.builder().setDelimiter(',').get().builder().setQuote('"').get().builder().setEscape('?').get().builder().setQuoteMode(QuoteMode.NON_NUMERIC).get();
@@ -764,7 +762,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testPrintWithQuoteModeIsNONE() throws IOException {
+    void testPrintWithQuoteModeIsNONE() throws IOException {
         final Reader in = new StringReader("a,b,c");
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180.builder().setDelimiter(',').get().builder().setQuote('"').get().builder().setEscape('?').get().builder().setQuoteMode(QuoteMode.NONE).get();
@@ -773,7 +771,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testPrintWithQuotes() throws IOException {
+    void testPrintWithQuotes() throws IOException {
         final Reader in = new StringReader("\"a,b,c\r\nx,y,z");
         final Appendable out = new StringBuilder();
         final CSVFormat format = CSVFormat.RFC4180.builder().setDelimiter(',').get().builder().setQuote('"').get().builder().setEscape('?').get().builder().setQuoteMode(QuoteMode.NON_NUMERIC).get();
@@ -782,46 +780,44 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testQuoteCharSameAsCommentStartThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setQuote('!').setCommentMarker('!').get());
+    void testQuoteCharSameAsCommentStartThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setQuote('!').setCommentMarker('!');
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testQuoteCharSameAsCommentStartThrowsExceptionForWrapperType() {
+    void testQuoteCharSameAsCommentStartThrowsExceptionForWrapperType() {
         // Cannot assume that callers won't use different Character objects
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setQuote(Character.valueOf('!')).setCommentMarker('!').get());
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setQuote(Character.valueOf('!')).setCommentMarker('!');
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
 
     @Test
-     void testQuoteCharSameAsDelimiterThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setQuote('!').setDelimiter('!').get());
+    void testQuoteCharSameAsDelimiterThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setQuote('!').setDelimiter('!');
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
 
     @Test
-     void testQuoteModeNoneShouldReturnMeaningfulExceptionMessage() {
-        final Exception exception = assertThrows(IllegalArgumentException.class, () ->
-        // @formatter:off
-            CSVFormat.DEFAULT.builder()
-                    .setHeader("Col1", "Col2", "Col3", "Col4")
-                    .setQuoteMode(QuoteMode.NONE)
-                    .get()
-        // @formatter:on
-        );
+    void testQuoteModeNoneShouldReturnMeaningfulExceptionMessage() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setHeader("Col1", "Col2", "Col3", "Col4").setQuoteMode(QuoteMode.NONE);
+        final Exception exception = assertThrows(IllegalArgumentException.class, builder::get);
         final String actualMessage = exception.getMessage();
         final String expectedMessage = "Quote mode set to NONE but no escape character is set";
         assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
-     void testQuotePolicyNoneWithoutEscapeThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.newFormat('!').builder().setQuoteMode(QuoteMode.NONE).get());
+    void testQuotePolicyNoneWithoutEscapeThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.newFormat('!').builder().setQuoteMode(QuoteMode.NONE);
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
 
     @Test
-     void testRFC4180() {
+    void testRFC4180() {
         assertNull(RFC4180.getCommentMarker());
         assertEquals(",", RFC4180.getDelimiterString());
         assertNull(RFC4180.getEscapeCharacter());
@@ -833,7 +829,7 @@ import org.junit.jupiter.api.Test;
 
     @SuppressWarnings("boxing") // no need to worry about boxing here
     @Test
-     void testSerialization() throws Exception {
+    void testSerialization() throws Exception {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try (final ObjectOutputStream oos = new ObjectOutputStream(out)) {
@@ -855,7 +851,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testToString() {
+    void testToString() {
 
         final String string = CSVFormat.INFORMIX_UNLOAD.toString();
 
@@ -864,7 +860,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testToStringAndWithCommentMarkerTakingCharacter() {
+    void testToStringAndWithCommentMarkerTakingCharacter() {
 
         final CSVFormat.Predefined csvFormat_Predefined = CSVFormat.Predefined.Default;
         final CSVFormat csvFormat = csvFormat_Predefined.getFormat();
@@ -1025,7 +1021,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testTrim() throws IOException {
+    void testTrim() throws IOException {
         final CSVFormat formatWithTrim = CSVFormat.DEFAULT.builder().setDelimiter(',').get().builder().setTrim(true).get().builder().setQuote(null).get().builder().setRecordSeparator(CRLF).get();
 
         CharSequence in = "a,b,c";
@@ -1050,29 +1046,31 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testWithCommentStart() {
+    void testWithCommentStart() {
         final CSVFormat formatWithCommentStart = CSVFormat.DEFAULT.builder().setCommentMarker('#').get();
         assertEquals(Character.valueOf('#'), formatWithCommentStart.getCommentMarker());
     }
 
     @Test
-     void testWithCommentStartCRThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setCommentMarker(CR).get());
+    void testWithCommentStartCRThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setCommentMarker(CR);
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testWithDelimiter() {
+    void testWithDelimiter() {
         final CSVFormat formatWithDelimiter = CSVFormat.DEFAULT.builder().setDelimiter('!').get();
         assertEquals("!", formatWithDelimiter.getDelimiterString());
     }
 
     @Test
-     void testWithDelimiterLFThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter(LF).get());
+    void testWithDelimiterLFThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDelimiter(LF);
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testWithEmptyDuplicates() {
+    void testWithEmptyDuplicates() {
         final CSVFormat formatWithEmptyDuplicates = CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get();
 
         assertEquals(DuplicateHeaderMode.ALLOW_EMPTY, formatWithEmptyDuplicates.getDuplicateHeaderMode());
@@ -1080,24 +1078,25 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testWithEmptyEnum() {
+    void testWithEmptyEnum() {
         final CSVFormat formatWithHeader = CSVFormat.DEFAULT.builder().setHeader(EmptyEnum.class).get();
         assertEquals(0, formatWithHeader.getHeader().length);
     }
 
     @Test
-     void testWithEscape() {
+    void testWithEscape() {
         final CSVFormat formatWithEscape = CSVFormat.DEFAULT.builder().setEscape('&').get();
         assertEquals(Character.valueOf('&'), formatWithEscape.getEscapeCharacter());
     }
 
     @Test
-     void testWithEscapeCRThrowsExceptions() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setEscape(CR).get());
+    void testWithEscapeCRThrowsExceptions() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setEscape(CR);
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testWithFirstRecordAsHeader() {
+    void testWithFirstRecordAsHeader() {
         final CSVFormat formatWithFirstRecordAsHeader = CSVFormat.DEFAULT.builder()
                 .setHeader()
                 .setSkipHeaderRecord(true)
@@ -1107,8 +1106,8 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testWithHeader() {
-        final String[] header = { "one", "two", "three" };
+    void testWithHeader() {
+        final String[] header = {"one", "two", "three"};
         // withHeader() makes a copy of the header array.
         final CSVFormat formatWithHeader = CSVFormat.DEFAULT.builder().setHeader(header).get();
         assertArrayEquals(header, formatWithHeader.getHeader());
@@ -1116,7 +1115,7 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testWithHeaderComments() {
+    void testWithHeaderComments() {
 
         final CSVFormat csvFormat = CSVFormat.DEFAULT;
 
@@ -1277,80 +1276,81 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testWithHeaderEnum() {
+    void testWithHeaderEnum() {
         final CSVFormat formatWithHeader = CSVFormat.DEFAULT.builder().setHeader(Header.class).get();
-        assertArrayEquals(new String[] { "Name", "Email", "Phone" }, formatWithHeader.getHeader());
+        assertArrayEquals(new String[]{"Name", "Email", "Phone"}, formatWithHeader.getHeader());
     }
 
     @Test
-     void testWithHeaderEnumNull() {
+    void testWithHeaderEnumNull() {
         final CSVFormat format = CSVFormat.DEFAULT;
         final Class<Enum<?>> simpleName = null;
         format.builder().setHeader(simpleName).get();
     }
 
     @Test
-     void testWithHeaderResultSetNull() throws SQLException {
+    void testWithHeaderResultSetNull() throws SQLException {
         final CSVFormat format = CSVFormat.DEFAULT;
         final ResultSet resultSet = null;
         format.builder().setHeader(resultSet).get();
     }
 
     @Test
-     void testWithIgnoreEmptyLines() {
+    void testWithIgnoreEmptyLines() {
         assertFalse(CSVFormat.DEFAULT.builder().setIgnoreEmptyLines(false).get().getIgnoreEmptyLines());
         assertTrue(CSVFormat.DEFAULT.builder().setIgnoreEmptyLines(true).get().getIgnoreEmptyLines());
     }
 
     @Test
-     void testWithIgnoreSurround() {
+    void testWithIgnoreSurround() {
         assertFalse(CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(false).get().getIgnoreSurroundingSpaces());
         assertTrue(CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(true).get().getIgnoreSurroundingSpaces());
     }
 
     @Test
-     void testWithNullString() {
+    void testWithNullString() {
         final CSVFormat formatWithNullString = CSVFormat.DEFAULT.builder().setNullString("null").get();
         assertEquals("null", formatWithNullString.getNullString());
     }
 
     @Test
-     void testWithQuoteChar() {
+    void testWithQuoteChar() {
         final CSVFormat formatWithQuoteChar = CSVFormat.DEFAULT.builder().setQuote('"').get();
         assertEquals(Character.valueOf('"'), formatWithQuoteChar.getQuoteCharacter());
     }
 
     @Test
-     void testWithQuoteLFThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setQuote(LF).get());
+    void testWithQuoteLFThrowsException() {
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setQuote(LF);
+        assertThrows(IllegalArgumentException.class, builder::get);
     }
 
     @Test
-     void testWithQuotePolicy() {
+    void testWithQuotePolicy() {
         final CSVFormat formatWithQuotePolicy = CSVFormat.DEFAULT.builder().setQuoteMode(QuoteMode.ALL).get();
         assertEquals(QuoteMode.ALL, formatWithQuotePolicy.getQuoteMode());
     }
 
     @Test
-     void testWithRecordSeparatorCR() {
+    void testWithRecordSeparatorCR() {
         final CSVFormat formatWithRecordSeparator = CSVFormat.DEFAULT.builder().setRecordSeparator(CR).get();
         assertEquals(String.valueOf(CR), formatWithRecordSeparator.getRecordSeparator());
     }
 
     @Test
-     void testWithRecordSeparatorCRLF() {
+    void testWithRecordSeparatorCRLF() {
         final CSVFormat formatWithRecordSeparator = CSVFormat.DEFAULT.builder().setRecordSeparator(CRLF).get();
         assertEquals(CRLF, formatWithRecordSeparator.getRecordSeparator());
     }
 
     @Test
-     void testWithRecordSeparatorLF() {
+    void testWithRecordSeparatorLF() {
         final CSVFormat formatWithRecordSeparator = CSVFormat.DEFAULT.builder().setRecordSeparator(LF).get();
         assertEquals(String.valueOf(LF), formatWithRecordSeparator.getRecordSeparator());
     }
 
     @Test
-     void testWithSystemRecordSeparator() {
+    void testWithSystemRecordSeparator() {
         final CSVFormat formatWithRecordSeparator = CSVFormat.DEFAULT.builder().setRecordSeparator(System.lineSeparator()).get();
         assertEquals(System.lineSeparator(), formatWithRecordSeparator.getRecordSeparator());
     }

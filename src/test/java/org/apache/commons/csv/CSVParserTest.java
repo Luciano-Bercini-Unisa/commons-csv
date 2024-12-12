@@ -1410,9 +1410,6 @@ class CSVParserTest {
         } catch (IOException e) {
             fail("Parsing should not throw an exception, but it did: " + e.getMessage());
         }
-//        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c','")).nextRecord());
-//        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c'abc,xyz")).nextRecord());
-//        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'abc'a,b,c',xyz")).nextRecord());
     }
     
     
