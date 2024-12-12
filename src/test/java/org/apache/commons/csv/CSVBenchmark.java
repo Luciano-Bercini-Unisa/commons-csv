@@ -90,7 +90,7 @@ public class CSVBenchmark {
         int count = 0;
 
         try (final Reader in = getReader()) {
-            final CSVFormat format = CSVFormat.Builder.create().setSkipHeaderRecord(true).build();
+            final CSVFormat format = CSVFormat.Builder.create().setSkipHeaderRecord(true).get();
             Iterator<CSVRecord> iter = format.parse(in).iterator();
             while (iter.hasNext()) {
                 count++;

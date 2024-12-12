@@ -64,17 +64,17 @@ class CSVFileParserTest {
             final String[] split = line.split(" ");
             assertTrue(split.length >= 1, testFile.getName() + " require 1 param");
             // first line starts with csv data file name
-            CSVFormat format = CSVFormat.newFormat(',').withQuote('"');
+            CSVFormat format = CSVFormat.newFormat(',').builder().setQuote('"').get();
             boolean checkComments = false;
             for (int i = 1; i < split.length; i++) {
                 final String option = split[i];
                 final String[] option_parts = option.split("=", 2);
                 if ("IgnoreEmpty".equalsIgnoreCase(option_parts[0])) {
-                    format = format.withIgnoreEmptyLines(Boolean.parseBoolean(option_parts[1]));
+                    format = format.builder().setIgnoreEmptyLines(Boolean.parseBoolean(option_parts[1])).get();
                 } else if ("IgnoreSpaces".equalsIgnoreCase(option_parts[0])) {
-                    format = format.withIgnoreSurroundingSpaces(Boolean.parseBoolean(option_parts[1]));
+                    format = format.builder().setIgnoreSurroundingSpaces(Boolean.parseBoolean(option_parts[1])).get();
                 } else if ("CommentStart".equalsIgnoreCase(option_parts[0])) {
-                    format = format.withCommentMarker(option_parts[1].charAt(0));
+                    format = format.builder().setCommentMarker(option_parts[1].charAt(0)).get();
                 } else if ("CheckComments".equalsIgnoreCase(option_parts[0])) {
                     checkComments = true;
                 } else {
@@ -109,17 +109,17 @@ class CSVFileParserTest {
             final String[] split = line.split(" ");
             assertTrue(split.length >= 1, testFile.getName() + " require 1 param");
             // first line starts with csv data file name
-            CSVFormat format = CSVFormat.newFormat(',').withQuote('"');
+            CSVFormat format = CSVFormat.newFormat(',').builder().setQuote('"').get();
             boolean checkComments = false;
             for (int i = 1; i < split.length; i++) {
                 final String option = split[i];
                 final String[] option_parts = option.split("=", 2);
                 if ("IgnoreEmpty".equalsIgnoreCase(option_parts[0])) {
-                    format = format.withIgnoreEmptyLines(Boolean.parseBoolean(option_parts[1]));
+                    format = format.builder().setIgnoreEmptyLines(Boolean.parseBoolean(option_parts[1])).get();
                 } else if ("IgnoreSpaces".equalsIgnoreCase(option_parts[0])) {
-                    format = format.withIgnoreSurroundingSpaces(Boolean.parseBoolean(option_parts[1]));
+                    format = format.builder().setIgnoreSurroundingSpaces(Boolean.parseBoolean(option_parts[1])).get();
                 } else if ("CommentStart".equalsIgnoreCase(option_parts[0])) {
-                    format = format.withCommentMarker(option_parts[1].charAt(0));
+                    format = format.builder().setCommentMarker(option_parts[1].charAt(0)).get();
                 } else if ("CheckComments".equalsIgnoreCase(option_parts[0])) {
                     checkComments = true;
                 } else {

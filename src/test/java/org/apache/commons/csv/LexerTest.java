@@ -53,7 +53,7 @@ import org.junit.jupiter.api.Test;
 
     @BeforeEach
      void setUp() {
-        formatWithEscaping = CSVFormat.DEFAULT.withEscape('\\');
+        formatWithEscaping = CSVFormat.DEFAULT.builder().setEscape('\\').get();
     }
 
     // simple token with escaping enabled
@@ -63,7 +63,7 @@ import org.junit.jupiter.api.Test;
          * file: a,\,,b \,,
          */
         final String code = "a,\\,,b\\\\\n\\,,\\\nc,d\\\r\ne";
-        final CSVFormat format = formatWithEscaping.withIgnoreEmptyLines(false);
+        final CSVFormat format = formatWithEscaping.builder().setIgnoreEmptyLines(false).get();
         assertTrue(format.isEscapeCharacterSet());
         try (final Lexer parser = createLexer(code, format)) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "a"));
@@ -109,7 +109,7 @@ import org.junit.jupiter.api.Test;
      void testComments() throws IOException {
         final String code = "first,line,\n" + "second,line,tokenWith#no-comment\n" + "# comment line \n" +
                 "third,line,#no-comment\n" + "# penultimate comment\n" + "# Final comment\n";
-        final CSVFormat format = CSVFormat.DEFAULT.withCommentMarker('#');
+        final CSVFormat format = CSVFormat.DEFAULT.builder().setCommentMarker('#').get();
         try (final Lexer parser = createLexer(code, format)) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "first"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "line"));
@@ -144,7 +144,7 @@ import org.junit.jupiter.api.Test;
                 "\n" + // 6b
                 "\n" + // 6c
                 "# Final comment\n"; // 7
-        final CSVFormat format = CSVFormat.DEFAULT.withCommentMarker('#').withIgnoreEmptyLines(false);
+        final CSVFormat format = CSVFormat.DEFAULT.builder().setCommentMarker('#').get().builder().setIgnoreEmptyLines(false).get();
         assertFalse(format.getIgnoreEmptyLines(), "Should not ignore empty lines");
 
         try (final Lexer parser = createLexer(code, format)) {
@@ -226,14 +226,14 @@ import org.junit.jupiter.api.Test;
     @Test
      void testEscapedControlCharacter() throws Exception {
         // we are explicitly using an escape different from \ here
-        try (final Lexer lexer = createLexer("character!rEscaped", CSVFormat.DEFAULT.withEscape('!'))) {
+        try (final Lexer lexer = createLexer("character!rEscaped", CSVFormat.DEFAULT.builder().setEscape('!').get())) {
             assertThat(lexer.nextToken(new Token()), hasContent("character" + CR + "Escaped"));
         }
     }
 
     @Test
      void testEscapedControlCharacter2() throws Exception {
-        try (final Lexer lexer = createLexer("character\\rEscaped", CSVFormat.DEFAULT.withEscape('\\'))) {
+        try (final Lexer lexer = createLexer("character\\rEscaped", CSVFormat.DEFAULT.builder().setEscape('\\').get())) {
             assertThat(lexer.nextToken(new Token()), hasContent("character" + CR + "Escaped"));
         }
     }
@@ -294,7 +294,7 @@ import org.junit.jupiter.api.Test;
      void testIgnoreEmptyLines() throws IOException {
         final String code = "first,line,\n" + "\n" + "\n" + "second,line\n" + "\n" + "\n" + "third line \n" + "\n" +
                 "\n" + "last, line \n" + "\n" + "\n" + "\n";
-        final CSVFormat format = CSVFormat.DEFAULT.withIgnoreEmptyLines();
+        final CSVFormat format = CSVFormat.DEFAULT.builder().setIgnoreEmptyLines(true).get();
         try (final Lexer parser = createLexer(code, format)) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "first"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "line"));
@@ -311,7 +311,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testIsMetaCharCommentStart() throws IOException {
-        try (final Lexer lexer = createLexer("#", CSVFormat.DEFAULT.withCommentMarker('#'))) {
+        try (final Lexer lexer = createLexer("#", CSVFormat.DEFAULT.builder().setCommentMarker('#').get())) {
             final int ch = lexer.readEscape();
             assertEquals('#', ch);
         }
@@ -332,7 +332,7 @@ import org.junit.jupiter.api.Test;
          * file: a,"foo",b a, " foo",b a,"foo " ,b // whitespace after closing encapsulator a, " foo " ,b
          */
         final String code = "a,\"foo\",b\na,   \" foo\",b\na,\"foo \"  ,b\na,  \" foo \"  ,b";
-        try (final Lexer parser = createLexer(code, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
+        try (final Lexer parser = createLexer(code, CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(true).get())) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "a"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "foo"));
             assertThat(parser.nextToken(new Token()), matches(EORECORD, "b"));
@@ -369,7 +369,7 @@ import org.junit.jupiter.api.Test;
          * file: a;'b and \' more ' !comment;;;; ;;
          */
         final String code = "a;'b and '' more\n'\n!comment;;;;\n;;";
-        final CSVFormat format = CSVFormat.DEFAULT.withQuote('\'').withCommentMarker('!').withDelimiter(';');
+        final CSVFormat format = CSVFormat.DEFAULT.builder().setQuote('\'').get().builder().setCommentMarker('!').get().builder().setDelimiter(';').get();
         try (final Lexer parser = createLexer(code, format)) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "a"));
             assertThat(parser.nextToken(new Token()), matches(EORECORD, "b and ' more\n"));
@@ -378,7 +378,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testReadEscapeBackspace() throws IOException {
-        try (final Lexer lexer = createLexer("b", CSVFormat.DEFAULT.withEscape('\b'))) {
+        try (final Lexer lexer = createLexer("b", CSVFormat.DEFAULT.builder().setEscape('\b').get())) {
             final int ch = lexer.readEscape();
             assertEquals(BACKSPACE, ch);
         }
@@ -386,7 +386,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testReadEscapeFF() throws IOException {
-        try (final Lexer lexer = createLexer("f", CSVFormat.DEFAULT.withEscape('\f'))) {
+        try (final Lexer lexer = createLexer("f", CSVFormat.DEFAULT.builder().setEscape('\f').get())) {
             final int ch = lexer.readEscape();
             assertEquals(FF, ch);
         }
@@ -394,7 +394,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testReadEscapeTab() throws IOException {
-        try (final Lexer lexer = createLexer("t", CSVFormat.DEFAULT.withEscape('\t'))) {
+        try (final Lexer lexer = createLexer("t", CSVFormat.DEFAULT.builder().setEscape('\t').get())) {
             final int ch = lexer.readEscape();
             assertThat(lexer.nextToken(new Token()), matches(EOF, ""));
             assertEquals(TAB, ch);
@@ -404,7 +404,7 @@ import org.junit.jupiter.api.Test;
     @Test
      void testSurroundingSpacesAreDeleted() throws IOException {
         final String code = "noSpaces,  leadingSpaces,trailingSpaces  ,  surroundingSpaces  ,  ,,";
-        try (final Lexer parser = createLexer(code, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
+        try (final Lexer parser = createLexer(code, CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(true).get())) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "noSpaces"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "leadingSpaces"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "trailingSpaces"));
@@ -418,7 +418,7 @@ import org.junit.jupiter.api.Test;
     @Test
      void testSurroundingTabsAreDeleted() throws IOException {
         final String code = "noTabs,\tleadingTab,trailingTab\t,\tsurroundingTabs\t,\t\t,,";
-        try (final Lexer parser = createLexer(code, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
+        try (final Lexer parser = createLexer(code, CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(true).get())) {
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "noTabs"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "leadingTab"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "trailingTab"));

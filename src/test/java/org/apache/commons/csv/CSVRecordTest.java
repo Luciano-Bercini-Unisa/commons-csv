@@ -84,7 +84,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testCSVRecordNULLValues() throws IOException {
-        try (CSVParser parser = CSVParser.parse("A,B\r\nONE,TWO", CSVFormat.DEFAULT.withHeader())) {
+        try (CSVParser parser = CSVParser.parse("A,B\r\nONE,TWO", CSVFormat.DEFAULT.builder().setHeader().get())) {
             final CSVRecord csvRecord = new CSVRecord(parser, null, null, 0L, 0L);
             assertEquals(0, csvRecord.size());
             assertThrows(IllegalArgumentException.class, () -> csvRecord.get("B"));
@@ -193,7 +193,7 @@ import org.junit.jupiter.api.Test;
      void testIsInconsistent() throws IOException {
         final String[] headers = { "first", "second", "third" };
         final String rowData = StringUtils.join(values, ',');
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader(headers).parse(new StringReader(rowData))) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader(headers).get().parse(new StringReader(rowData))) {
             final Map<String, Integer> map = parser.getHeaderMapRaw();
             final CSVRecord record1 = parser.iterator().next();
             map.put("fourth", Integer.valueOf(4));
@@ -262,7 +262,7 @@ import org.junit.jupiter.api.Test;
     @Test
      void testSerialization() throws IOException, ClassNotFoundException {
         final CSVRecord shortRec;
-        try (final CSVParser parser = CSVParser.parse("A,B\n#my comment\nOne,Two", CSVFormat.DEFAULT.withHeader().withCommentMarker('#'))) {
+        try (final CSVParser parser = CSVParser.parse("A,B\n#my comment\nOne,Two", CSVFormat.DEFAULT.builder().setHeader().get().builder().setCommentMarker('#').get())) {
             shortRec = parser.iterator().next();
         }
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -356,7 +356,7 @@ import org.junit.jupiter.api.Test;
 
     @Test
      void testToMapWithShortRecord() throws Exception {
-        try (final CSVParser parser = CSVParser.parse("a,b", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
+        try (final CSVParser parser = CSVParser.parse("a,b", CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get())) {
             final CSVRecord shortRec = parser.iterator().next();
             shortRec.toMap();
         }

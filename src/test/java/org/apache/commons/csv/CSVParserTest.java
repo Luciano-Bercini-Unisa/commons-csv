@@ -69,7 +69,7 @@ import org.junit.jupiter.params.provider.EnumSource;
  */
 class CSVParserTest {
 
-    private static final CSVFormat EXCEL_WITH_HEADER = CSVFormat.EXCEL.withHeader();
+    private static final CSVFormat EXCEL_WITH_HEADER = CSVFormat.EXCEL.builder().setHeader().get();
 
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
@@ -163,7 +163,7 @@ class CSVParserTest {
             {"/", "/"}, // 7
             {"   8   ", "   \"quoted \"\" /\" / string\"   "}, {"9", "   \n   "} };
         // @formatter:on
-        final CSVFormat format = CSVFormat.newFormat(',').withQuote('\'').withRecordSeparator(CRLF).withEscape('/').withIgnoreEmptyLines();
+        final CSVFormat format = CSVFormat.newFormat(',').builder().setQuote('\'').get().builder().setRecordSeparator(CRLF).get().builder().setEscape('/').get().builder().setIgnoreEmptyLines(true).get();
         try (final CSVParser parser = CSVParser.parse(code, format)) {
             final List<CSVRecord> records = parser.getRecords();
             assertFalse(records.isEmpty());
@@ -186,7 +186,7 @@ class CSVParserTest {
             {" / ", " , ", " ,"}, // 3
         };
         // @formatter:on
-        final CSVFormat format = CSVFormat.newFormat(',').withRecordSeparator(CRLF).withEscape('/').withIgnoreEmptyLines();
+        final CSVFormat format = CSVFormat.newFormat(',').builder().setRecordSeparator(CRLF).get().builder().setEscape('/').get().builder().setIgnoreEmptyLines(true).get();
         try (final CSVParser parser = CSVParser.parse(code, format)) {
             final List<CSVRecord> records = parser.getRecords();
             assertFalse(records.isEmpty());
@@ -279,7 +279,7 @@ class CSVParserTest {
     void testClose() throws Exception {
         final Reader in = new StringReader("# comment\na,b,c\n1,2,3\nx,y,z");
         final Iterator<CSVRecord> records;
-        try (final CSVParser parser = CSVFormat.DEFAULT.withCommentMarker('#').withHeader().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setCommentMarker('#').get().builder().setHeader().get().parse(in)) {
             records = parser.iterator();
             assertTrue(records.hasNext());
         }
@@ -427,7 +427,7 @@ class CSVParserTest {
             final List<CSVRecord> records = parser.getRecords();
             assertFalse(records.isEmpty());
             Utils.compare("Failed to parse without comments", res, records);
-            format = CSVFormat.DEFAULT.withCommentMarker('#');
+            format = CSVFormat.DEFAULT.builder().setCommentMarker('#').get();
         }
         try (final CSVParser parser = CSVParser.parse(code, format)) {
             final List<CSVRecord> records = parser.getRecords();
@@ -437,7 +437,7 @@ class CSVParserTest {
 
     @Test
     void testDuplicateHeadersAllowedByDefault() throws Exception {
-        try (CSVParser parser = CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader())) {
+        try (CSVParser parser = CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader().get())) {
             // noop
         }
     }
@@ -445,7 +445,7 @@ class CSVParserTest {
     @Test
     void testDuplicateHeadersNotAllowed() {
         assertThrows(IllegalArgumentException.class,
-                () -> CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader().withAllowDuplicateHeaderNames(false)));
+                () -> CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader().get().builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get()));
     }
 
     @Test
@@ -458,7 +458,10 @@ class CSVParserTest {
 
     @Test
     void testEmptyFileHeaderParsing() throws Exception {
-        try (final CSVParser parser = CSVParser.parse("", CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+        try (final CSVParser parser = CSVParser.parse("", CSVFormat.DEFAULT.builder()
+                .setHeader()
+                .setSkipHeaderRecord(true)
+                .get())) {
             assertNull(parser.nextRecord());
             assertTrue(parser.getHeaderNames().isEmpty());
         }
@@ -703,7 +706,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderMap() throws Exception {
-        try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
+        try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get())) {
             final Map<String, Integer> headerMap = parser.getHeaderMap();
             final Iterator<String> columnNames = headerMap.keySet().iterator();
             // Headers are iterated in column order.
@@ -727,7 +730,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderNames() throws IOException {
-        try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
+        try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get())) {
             final Map<String, Integer> nameIndexMap = parser.getHeaderMap();
             final List<String> headerNames = parser.getHeaderNames();
             assertNotNull(headerNames);
@@ -741,7 +744,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderNamesReadOnly() throws IOException {
-        try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.withHeader("A", "B", "C"))) {
+        try (final CSVParser parser = CSVParser.parse("a,b,c\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get())) {
             final List<String> headerNames = parser.getHeaderNames();
             assertNotNull(headerNames);
             assertThrows(UnsupportedOperationException.class, () -> headerNames.add("This is a read-only list."));
@@ -750,7 +753,7 @@ class CSVParserTest {
 
     @Test
     void testGetLine() throws IOException {
-        try (final CSVParser parser = CSVParser.parse(CSV_INPUT, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
+        try (final CSVParser parser = CSVParser.parse(CSV_INPUT, CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(true).get())) {
             for (final String[] re : RESULT) {
                 assertArrayEquals(re, parser.nextRecord().values());
             }
@@ -833,7 +836,7 @@ class CSVParserTest {
 
     @Test
     void testGetRecords() throws IOException {
-        try (final CSVParser parser = CSVParser.parse(CSV_INPUT, CSVFormat.DEFAULT.withIgnoreSurroundingSpaces())) {
+        try (final CSVParser parser = CSVParser.parse(CSV_INPUT, CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(true).get())) {
             final List<CSVRecord> records = parser.getRecords();
             assertEquals(RESULT.length, records.size());
             assertFalse(records.isEmpty());
@@ -854,7 +857,7 @@ class CSVParserTest {
     @Test
     void testGetRecordWithMultiLineValues() throws Exception {
         try (final CSVParser parser = CSVParser.parse("\"a\r\n1\",\"a\r\n2\"" + CRLF + "\"b\r\n1\",\"b\r\n2\"" + CRLF + "\"c\r\n1\",\"c\r\n2\"",
-                CSVFormat.DEFAULT.withRecordSeparator(CRLF))) {
+                CSVFormat.DEFAULT.builder().setRecordSeparator(CRLF).get())) {
             CSVRecord record;
             assertEquals(0, parser.getRecordNumber());
             assertEquals(0, parser.getCurrentLineNumber());
@@ -943,7 +946,7 @@ class CSVParserTest {
     void testHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
 
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
 
             for (int i = 0; i < 2; i++) {
@@ -961,7 +964,7 @@ class CSVParserTest {
     @Test
     void testHeaderComment() throws Exception {
         final Reader in = new StringReader("# comment\na,b,c\n1,2,3\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withCommentMarker('#').withHeader().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setCommentMarker('#').get().builder().setHeader().get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             for (int i = 0; i < 2; i++) {
                 assertTrue(records.hasNext());
@@ -977,7 +980,7 @@ class CSVParserTest {
     @Test
     void testHeaderMissing() throws Exception {
         final Reader in = new StringReader("a,,c\n1,2,3\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             for (int i = 0; i < 2; i++) {
                 assertTrue(records.hasNext());
@@ -992,7 +995,7 @@ class CSVParserTest {
     @Test
     void testHeaderMissingWithNull() throws Exception {
         final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().withNullString("").withAllowMissingColumnNames().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setNullString("").get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
             parser.iterator();
         }
     }
@@ -1000,7 +1003,7 @@ class CSVParserTest {
     @Test
     void testHeadersMissing() throws Exception {
         try (final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-             final CSVParser parser = CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames().parse(in)) {
+             final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
             parser.iterator();
         }
     }
@@ -1008,19 +1011,19 @@ class CSVParserTest {
     @Test
     void testHeadersMissingException() {
         final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.withHeader().parse(in).iterator());
+        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setHeader().get().parse(in).iterator());
     }
 
     @Test
     void testHeadersMissingOneColumnException() {
         final Reader in = new StringReader("a,,c,d,e\n1,2,3,4,5\nv,w,x,y,z");
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.withHeader().parse(in).iterator());
+        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setHeader().get().parse(in).iterator());
     }
 
     @Test
     void testHeadersWithNullColumnName() throws IOException {
         final Reader in = new StringReader("header1,null,header3\n1,2,3\n4,5,6");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().withNullString("null").withAllowMissingColumnNames().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setNullString("null").get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             // Expect the null header to be missing
@@ -1033,7 +1036,7 @@ class CSVParserTest {
     @Test
     void testIgnoreCaseHeaderMapping() throws Exception {
         final Reader reader = new StringReader("1,2,3");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("One", "TWO", "three").withIgnoreHeaderCase().parse(reader)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("One", "TWO", "three").get().builder().setIgnoreHeaderCase(true).get().parse(reader)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("one"));
@@ -1055,7 +1058,7 @@ class CSVParserTest {
 
     @Test
     void testInvalidFormat() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.withDelimiter(CR));
+        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter(CR).get());
     }
 
     @Test
@@ -1143,7 +1146,7 @@ class CSVParserTest {
     @Test
     void testMappedButNotSetAsOutlook2007ContactExport() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("A", "B", "C").withSkipHeaderRecord().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             CSVRecord record;
             // 1st record
@@ -1231,7 +1234,7 @@ class CSVParserTest {
     @Test
     void testNotValueCSV() throws IOException {
         final String source = "#";
-        final CSVFormat csvFormat = CSVFormat.DEFAULT.withCommentMarker('#');
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setCommentMarker('#').get();
         try (final CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
             final CSVRecord csvRecord = csvParser.nextRecord();
             assertNull(csvRecord);
@@ -1377,7 +1380,7 @@ class CSVParserTest {
     @Test
     void testParseWithDelimiterWithEscape() throws IOException {
         final String source = "a!,b!,c,xyz";
-        final CSVFormat csvFormat = CSVFormat.DEFAULT.withEscape('!');
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setEscape('!').get();
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
             final CSVRecord csvRecord = csvParser.nextRecord();
             assertEquals("a,b,c", csvRecord.get(0));
@@ -1388,7 +1391,7 @@ class CSVParserTest {
     @Test
     void testParseWithDelimiterWithQuote() throws IOException {
         final String source = "'a,b,c',xyz";
-        final CSVFormat csvFormat = CSVFormat.DEFAULT.withQuote('\'');
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setQuote('\'').get();
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
             final CSVRecord csvRecord = csvParser.nextRecord();
             assertEquals("a,b,c", csvRecord.get(0));
@@ -1398,7 +1401,7 @@ class CSVParserTest {
 
     @Test
     void testParseWithQuoteThrowsException() {
-        final CSVFormat csvFormat = CSVFormat.DEFAULT.withQuote('\'');
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setQuote('\'').get();
         assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c','")).nextRecord());
         assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c'abc,xyz")).nextRecord());
         assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'abc'a,b,c',xyz")).nextRecord());
@@ -1407,7 +1410,7 @@ class CSVParserTest {
     @Test
     void testParseWithQuoteWithEscape() throws IOException {
         final String source = "'a?,b?,c?d',xyz";
-        final CSVFormat csvFormat = CSVFormat.DEFAULT.withQuote('\'').withEscape('?');
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setQuote('\'').get().builder().setEscape('?').get();
         try (CSVParser csvParser = csvFormat.parse(new StringReader(source))) {
             final CSVRecord csvRecord = csvParser.nextRecord();
             assertEquals("a,b,c?d", csvRecord.get(0));
@@ -1438,7 +1441,7 @@ class CSVParserTest {
     void testProvidedHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
 
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("A", "B", "C").parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
 
             for (int i = 0; i < 3; i++) {
@@ -1461,7 +1464,7 @@ class CSVParserTest {
     void testProvidedHeaderAuto() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
 
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
 
             for (int i = 0; i < 2; i++) {
@@ -1483,7 +1486,10 @@ class CSVParserTest {
     @Test
     void testRepeatedHeadersAreReturnedInCSVRecordHeaderNames() throws IOException {
         final Reader in = new StringReader("header1,header2,header1\n1,2,3\n4,5,6");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder()
+                .setHeader()
+                .setSkipHeaderRecord(true)
+                .get().builder().setTrim(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             @SuppressWarnings("resource") final CSVParser recordParser = record.getParser();
@@ -1507,7 +1513,7 @@ class CSVParserTest {
     @Test
     void testSkipAutoHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("a"));
@@ -1519,7 +1525,7 @@ class CSVParserTest {
     @Test
     void testSkipHeaderOverrideDuplicateHeaders() throws Exception {
         final Reader in = new StringReader("a,a,a\n1,2,3\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("X"));
@@ -1531,7 +1537,7 @@ class CSVParserTest {
     @Test
     void testSkipSetAltHeaders() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("X"));
@@ -1543,7 +1549,7 @@ class CSVParserTest {
     @Test
     void testSkipSetHeader() throws Exception {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("a", "b", "c").withSkipHeaderRecord().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("a", "b", "c").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("a"));
@@ -1603,7 +1609,7 @@ class CSVParserTest {
     @Test
     void testTrailingDelimiter() throws Exception {
         final Reader in = new StringReader("a,a,a,\n\"1\",\"2\",\"3\",\nx,y,z,");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().withTrailingDelimiter().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().builder().setTrailingDelimiter(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("X"));
@@ -1616,7 +1622,7 @@ class CSVParserTest {
     @Test
     void testTrim() throws Exception {
         final Reader in = new StringReader("a,a,a\n\" 1 \",\" 2 \",\" 3 \"\nx,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.withHeader("X", "Y", "Z").withSkipHeaderRecord().withTrim().parse(in)) {
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().builder().setTrim(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
             final CSVRecord record = records.next();
             assertEquals("1", record.get("X"));
@@ -1627,7 +1633,7 @@ class CSVParserTest {
     }
 
     private void validateLineNumbers(final String lineSeparator) throws IOException {
-        try (final CSVParser parser = CSVParser.parse("a" + lineSeparator + "b" + lineSeparator + "c", CSVFormat.DEFAULT.withRecordSeparator(lineSeparator))) {
+        try (final CSVParser parser = CSVParser.parse("a" + lineSeparator + "b" + lineSeparator + "c", CSVFormat.DEFAULT.builder().setRecordSeparator(lineSeparator).get())) {
             assertEquals(0, parser.getCurrentLineNumber());
             assertNotNull(parser.nextRecord());
             assertEquals(1, parser.getCurrentLineNumber());
@@ -1643,7 +1649,7 @@ class CSVParserTest {
     }
 
     private void validateRecordNumbers(final String lineSeparator) throws IOException {
-        try (final CSVParser parser = CSVParser.parse("a" + lineSeparator + "b" + lineSeparator + "c", CSVFormat.DEFAULT.withRecordSeparator(lineSeparator))) {
+        try (final CSVParser parser = CSVParser.parse("a" + lineSeparator + "b" + lineSeparator + "c", CSVFormat.DEFAULT.builder().setRecordSeparator(lineSeparator).get())) {
             CSVRecord record;
             assertEquals(0, parser.getRecordNumber());
             assertNotNull(record = parser.nextRecord());
@@ -1668,7 +1674,7 @@ class CSVParserTest {
                 // unicode test... not very relevant while operating on strings instead of bytes, but for
                 // completeness...
                 "\u00c4,\u00d6,\u00dc" + lineSeparator + "EOF,EOF,EOF";
-        final CSVFormat format = CSVFormat.newFormat(',').withQuote('\'').withRecordSeparator(lineSeparator);
+        final CSVFormat format = CSVFormat.newFormat(',').builder().setQuote('\'').get().builder().setRecordSeparator(lineSeparator).get();
         final long positionRecord3;
         try (CSVParser parser = CSVParser.parse(code, format)) {
             CSVRecord record;
