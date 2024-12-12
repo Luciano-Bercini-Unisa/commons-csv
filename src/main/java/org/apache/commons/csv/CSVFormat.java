@@ -489,7 +489,7 @@ public final class CSVFormat implements Serializable {
          * <pre>
          * builder.setHeader();
          * </pre>
-         *
+         * <p>
          * or specified manually with:
          *
          * <pre>
@@ -513,7 +513,7 @@ public final class CSVFormat implements Serializable {
          * <pre>
          * builder.setHeader();
          * </pre>
-         *
+         * <p>
          * or specified manually with:
          *
          * <pre>
@@ -545,7 +545,7 @@ public final class CSVFormat implements Serializable {
          * <pre>
          * builder.setHeader();
          * </pre>
-         *
+         * <p>
          * or specified manually with:
          *
          * <pre>{@code
@@ -2378,7 +2378,6 @@ public final class CSVFormat implements Serializable {
      */
     // the original object is needed so can check for Number
     private void printWithQuotes(final Object object, final CharSequence charSeq, final Appendable out, final boolean newRecord) throws IOException {
-        boolean quote = false;
         int start = 0;
         int pos = 0;
         final int len = charSeq.length();
@@ -2393,64 +2392,13 @@ public final class CSVFormat implements Serializable {
         if (quoteModePolicy == null) {
             quoteModePolicy = QuoteMode.MINIMAL;
         }
-        switch (quoteModePolicy) {
-            case ALL:
-            case ALL_NON_NULL:
-                quote = true;
-                break;
-            case NON_NUMERIC:
-                quote = !(object instanceof Number);
-                break;
-            case NONE:
-                // Use the existing escaping code
-                printWithEscapes(charSeq, out);
-                return;
-            case MINIMAL:
-                if (len <= 0) {
-                    // Always quote an empty token that is the first
-                    // on the line, as it may be the only thing on the
-                    // line. If it were not quoted in that case,
-                    // an empty line has no tokens.
-                    if (newRecord) {
-                        quote = true;
-                    }
-                } else {
-                    char c = charSeq.charAt(pos);
-                    if (c <= Constants.COMMENT) {
-                        // Some other chars at the start of a value caused the parser to fail, so for now
-                        // encapsulate if we start in anything less than '#'. We are being conservative
-                        // by including the default comment char too.
-                        quote = true;
-                    } else {
-                        while (pos < len) {
-                            c = charSeq.charAt(pos);
-                            if (c == Constants.LF || c == Constants.CR || c == quoteChar || c == escapeChar || isDelimiter(c, charSeq, pos, delim, delimLength)) {
-                                quote = true;
-                                break;
-                            }
-                            pos++;
-                        }
-
-                        if (!quote) {
-                            pos = len - 1;
-                            c = charSeq.charAt(pos);
-                            // Some other chars at the end caused the parser to fail, so for now
-                            // encapsulate if we end in anything less than ' '
-                            if (isTrimChar(c)) {
-                                quote = true;
-                            }
-                        }
-                    }
-                }
-                if (!quote) {
-                    // No encapsulation needed - write out the original value
-                    out.append(charSeq, start, len);
-                    return;
-                }
-                break;
-            default:
-                throw new IllegalStateException("Unexpected Quote value: " + quoteModePolicy);
+        if (quoteModePolicy == QuoteMode.NONE) {
+            // Use the existing escaping code
+            printWithEscapes(charSeq, out);
+            return;
         }
+        boolean quote = evaluateQuoting(quoteModePolicy, object, charSeq, newRecord, 
+                pos, len, delim, delimLength, quoteChar, escapeChar);
         if (!quote) {
             // No encapsulation needed - write out the original value
             out.append(charSeq, start, len);
@@ -2473,6 +2421,46 @@ public final class CSVFormat implements Serializable {
         // Write the last segment
         out.append(charSeq, start, pos);
         out.append(quoteChar);
+    }
+
+    private boolean evaluateQuoting(QuoteMode quoteModePolicy, Object object, CharSequence charSeq,
+                                    boolean newRecord, int pos, int len, char[] delim, int delimLength,
+                                    char quoteChar, char escapeChar) {
+        switch (quoteModePolicy) {
+            case ALL:
+            case ALL_NON_NULL:
+                return true;
+            case NON_NUMERIC:
+                return !(object instanceof Number);
+            case MINIMAL:
+                if (len <= 0) {
+                    // Always quote an empty token that is the first
+                    // on the line, as it may be the only thing on the
+                    // line. If it were not quoted in that case,
+                    // an empty line has no tokens.
+                    return newRecord;
+                }
+                char c = charSeq.charAt(pos);
+                if (c <= Constants.COMMENT) {
+                    // Some other chars at the start of a value caused the parser to fail, so for now
+                    // encapsulate if we start in anything less than '#'. We are being conservative
+                    // by including the default comment char too.
+                    return true;
+                }
+                while (pos < len) {
+                    c = charSeq.charAt(pos);
+                    if (c == Constants.LF || c == Constants.CR || c == quoteChar || c == escapeChar || isDelimiter(c, charSeq, pos, delim, delimLength)) {
+                        return true;
+                    }
+                    pos++;
+                }
+                c = charSeq.charAt(len - 1);
+                // Some other chars at the end caused the parser to fail, so for now
+                // encapsulate if we end in anything less than ' '
+                return isTrimChar(c);
+            default:
+                throw new IllegalStateException("Unexpected Quote value: " + quoteModePolicy);
+        }
     }
 
     /**
