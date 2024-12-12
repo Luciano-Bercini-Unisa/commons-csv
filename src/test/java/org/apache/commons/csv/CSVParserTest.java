@@ -20,14 +20,7 @@ package org.apache.commons.csv;
 import static org.apache.commons.csv.Constants.CR;
 import static org.apache.commons.csv.Constants.CRLF;
 import static org.apache.commons.csv.Constants.LF;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -1402,10 +1395,27 @@ class CSVParserTest {
     @Test
     void testParseWithQuoteThrowsException() {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setQuote('\'').get();
-        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c','")).nextRecord());
-        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c'abc,xyz")).nextRecord());
-        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'abc'a,b,c',xyz")).nextRecord());
+        try (CSVParser parser = csvFormat.parse(new StringReader("'a,b,c','"))) {
+            assertThrows(IOException.class, parser::nextRecord);
+        } catch (IOException e) {
+            fail("Parsing should not throw an exception, but it did: " + e.getMessage());
+        }
+        try (CSVParser parser = csvFormat.parse(new StringReader("'a,b,c'abc,xyz"))) {
+            assertThrows(IOException.class, parser::nextRecord);
+        } catch (IOException e) {
+            fail("Parsing should not throw an exception, but it did: " + e.getMessage());
+        }
+        try (CSVParser parser = csvFormat.parse(new StringReader("'abc'a,b,c',xyz"))) {
+            assertThrows(IOException.class, parser::nextRecord);
+        } catch (IOException e) {
+            fail("Parsing should not throw an exception, but it did: " + e.getMessage());
+        }
+//        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c','")).nextRecord());
+//        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'a,b,c'abc,xyz")).nextRecord());
+//        assertThrows(IOException.class, () -> csvFormat.parse(new StringReader("'abc'a,b,c',xyz")).nextRecord());
     }
+    
+    
 
     @Test
     void testParseWithQuoteWithEscape() throws IOException {
