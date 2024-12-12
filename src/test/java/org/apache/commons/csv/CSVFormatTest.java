@@ -74,8 +74,8 @@ class CSVFormatTest {
 
     @Test
     void testDelimiterEmptyStringThrowsException1() {
-        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDelimiter("");
-        assertThrows(IllegalArgumentException.class, builder::get);
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setDelimiter(""));
     }
 
     @Test
@@ -1053,8 +1053,8 @@ class CSVFormatTest {
 
     @Test
     void testWithCommentStartCRThrowsException() {
-        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setCommentMarker(CR);
-        assertThrows(IllegalArgumentException.class, builder::get);
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setCommentMarker(CR));
     }
 
     @Test
@@ -1065,8 +1065,8 @@ class CSVFormatTest {
 
     @Test
     void testWithDelimiterLFThrowsException() {
-        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setDelimiter(LF);
-        assertThrows(IllegalArgumentException.class, builder::get);
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setDelimiter(LF));
     }
 
     @Test
@@ -1091,8 +1091,8 @@ class CSVFormatTest {
 
     @Test
     void testWithEscapeCRThrowsExceptions() {
-        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setEscape(CR);
-        assertThrows(IllegalArgumentException.class, builder::get);
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setEscape(CR));
     }
 
     @Test
@@ -1321,8 +1321,8 @@ class CSVFormatTest {
 
     @Test
     void testWithQuoteLFThrowsException() {
-        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder().setQuote(LF);
-        assertThrows(IllegalArgumentException.class, builder::get);
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setQuote(LF));
     }
 
     @Test
