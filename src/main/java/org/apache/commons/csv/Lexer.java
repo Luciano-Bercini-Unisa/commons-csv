@@ -43,9 +43,7 @@ final class Lexer implements Closeable {
     private final boolean lenientEof;
     private final boolean trailingData;
 
-    /**
-     * The buffered reader.
-     */
+    /** The buffered reader. */
     private final ExtendedBufferedReader reader;
     private String firstEol;
 
@@ -88,7 +86,8 @@ final class Lexer implements Closeable {
     /**
      * Closes resources.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException
+     *             If an I/O error occurs
      */
     @Override
     public void close() throws IOException {
@@ -128,7 +127,8 @@ final class Lexer implements Closeable {
     /**
      * Determine whether the next characters constitute a delimiter through {@link ExtendedBufferedReader#peek(char[])}.
      *
-     * @param ch the current character.
+     * @param ch
+     *             the current character.
      * @return true if the next characters constitute a delimiter.
      * @throws IOException If an I/O error occurs.
      */
@@ -172,7 +172,7 @@ final class Lexer implements Closeable {
 
     /**
      * Tests if the next characters constitute a escape delimiter through {@link ExtendedBufferedReader#peek(char[])}.
-     * <p>
+     *
      * For example, for delimiter "[|]" and escape '!', return true if the next characters constitute "![!|!]".
      *
      * @return true if the next characters constitute an escape delimiter.
@@ -210,20 +210,6 @@ final class Lexer implements Closeable {
         return ch == Constants.LF || ch == Constants.CR || ch == Constants.UNDEFINED;
     }
 
-
-    private boolean handleEmptyLines(Token token, int lastChar, int c, boolean eol) throws IOException {
-        while (eol && isStartOfLine(lastChar)) {
-            lastChar = c;
-            c = reader.read();
-            eol = readEndOfLine(c);
-            if (isEndOfFile(c)) {
-                token.type = Token.Type.EOF;
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Returns the next token.
      * <p>
@@ -244,8 +230,17 @@ final class Lexer implements Closeable {
         boolean eol = readEndOfLine(c);
         // empty line detection: eol AND (last char was EOL or beginning)
         if (ignoreEmptyLines) {
-            if (handleEmptyLines(token, lastChar, c, eol)) {
-                return token;
+            while (eol && isStartOfLine(lastChar)) {
+                // Go on char ahead ...
+                lastChar = c;
+                c = reader.read();
+                eol = readEndOfLine(c);
+                // reached the end of the file without any content (empty line at the end)
+                if (isEndOfFile(c)) {
+                    token.type = Token.Type.EOF;
+                    // don't set token.isReady here because no content
+                    return token;
+                }
             }
         }
         // Did we reach EOF during the last iteration already? EOF
@@ -275,30 +270,35 @@ final class Lexer implements Closeable {
                     eol = readEndOfLine(c);
                 }
             }
-            // ok, start of token reached: encapsulated, or token
-            if (isDelimiter(c)) {
-                // empty token return TOKEN("")
-                token.type = Token.Type.TOKEN;
-            } else if (eol) {
-                // empty token return EORECORD("")
-                // noop: token.content.append("");
-                token.type = Token.Type.EORECORD;
-            } else if (isQuoteChar(c)) {
-                // consume encapsulated token
-                parseEncapsulatedToken(token);
-            } else if (isEndOfFile(c)) {
-                // end of file return EOF()
-                // noop: token.content.append("");
-                token.type = Token.Type.EOF;
-                token.isReady = true; // there is data at EOF
-            } else {
-                // next token must be a simple token
-                // add removed blanks when not ignoring whitespace chars...
-                parseSimpleToken(token, c);
-            }
+            processTokenType(token, c, eol);
         }
         return token;
     }
+
+    private void processTokenType(Token token, int c, boolean eol) throws IOException {
+        // ok, start of token reached: encapsulated, or token
+        if (isDelimiter(c)) {
+            // empty token return TOKEN("")
+            token.type = Token.Type.TOKEN;
+        } else if (eol) {
+            // empty token return EORECORD("")
+            // noop: token.content.append("");
+            token.type = Token.Type.EORECORD;
+        } else if (isQuoteChar(c)) {
+            // consume encapsulated token
+            parseEncapsulatedToken(token);
+        } else if (isEndOfFile(c)) {
+            // end of file return EOF()
+            // noop: token.content.append("");
+            token.type = Token.Type.EOF;
+            token.isReady = true; // there is data at EOF
+        } else {
+            // next token must be a simple token
+            // add removed blanks when not ignoring whitespace chars...
+            parseSimpleToken(token, c);
+        }
+    }
+
 
     private int nullToDisabled(final Character c) {
         return c == null ? Constants.UNDEFINED : c.charValue(); // Explicit unboxing
@@ -319,10 +319,12 @@ final class Lexer implements Closeable {
      * </ul>
      * <li>end of stream has been reached (EOF)</li> </ul>
      *
-     * @param token the current token
+     * @param token
+     *            the current token
      * @return a valid token object
-     * @throws IOException  Thrown when in an invalid state: EOF before closing encapsulator or invalid character before
-     *                      delimiter or EOL.
+     * @throws IOException
+     *             Thrown when in an invalid state: EOF before closing encapsulator or invalid character before
+     *             delimiter or EOL.
      * @throws CSVException Thrown on invalid input.
      */
     private Token parseEncapsulatedToken(final Token token) throws IOException {
@@ -459,7 +461,6 @@ final class Lexer implements Closeable {
     }
 
     // TODO escape handling needs more work
-
     /**
      * Handle an escape sequence. The current character must be the escape character. On return, the next character is available by calling
      * {@link ExtendedBufferedReader#getLastChar()} on the input stream.
@@ -472,31 +473,31 @@ final class Lexer implements Closeable {
         // the escape char has just been read (normally a backslash)
         final int ch = reader.read();
         switch (ch) {
-            case 'r':
-                return Constants.CR;
-            case 'n':
-                return Constants.LF;
-            case 't':
-                return Constants.TAB;
-            case 'b':
-                return Constants.BACKSPACE;
-            case 'f':
-                return Constants.FF;
-            case Constants.CR:
-            case Constants.LF:
-            case Constants.FF: // TODO is this correct?
-            case Constants.TAB: // TODO is this correct? Do tabs need to be escaped?
-            case Constants.BACKSPACE: // TODO is this correct?
+        case 'r':
+            return Constants.CR;
+        case 'n':
+            return Constants.LF;
+        case 't':
+            return Constants.TAB;
+        case 'b':
+            return Constants.BACKSPACE;
+        case 'f':
+            return Constants.FF;
+        case Constants.CR:
+        case Constants.LF:
+        case Constants.FF: // TODO is this correct?
+        case Constants.TAB: // TODO is this correct? Do tabs need to be escaped?
+        case Constants.BACKSPACE: // TODO is this correct?
+            return ch;
+        case EOF:
+            throw new CSVException("EOF while processing escape sequence");
+        default:
+            // Now check for meta-characters
+            if (isMetaChar(ch)) {
                 return ch;
-            case EOF:
-                throw new CSVException("EOF while processing escape sequence");
-            default:
-                // Now check for meta-characters
-                if (isMetaChar(ch)) {
-                    return ch;
-                }
-                // indicate unexpected char - available from in.getLastChar()
-                return EOF;
+            }
+            // indicate unexpected char - available from in.getLastChar()
+            return EOF;
         }
     }
 
