@@ -128,24 +128,35 @@ final class ExtendedBufferedReader extends UnsynchronizedBufferedReader {
         if (length == 0) {
             return 0;
         }
+
         final int len = super.read(buf, offset, length);
+
         if (len > 0) {
-            for (int i = offset; i < offset + len; i++) {
-                final char ch = buf[i];
-                if (ch == LF) {
-                    if (CR != (i > offset ? buf[i - 1] : lastChar)) {
-                        lineNumber++;
-                    }
-                } else if (ch == CR) {
-                    lineNumber++;
-                }
-            }
+            processBuffer(buf, offset, len);
             lastChar = buf[offset + len - 1];
         } else if (len == EOF) {
             lastChar = EOF;
         }
+
         position += len;
         return len;
+    }
+
+    private void processBuffer(final char[] buf, final int offset, final int len) {
+        for (int i = offset; i < offset + len; i++) {
+            final char ch = buf[i];
+            if (ch == LF) {
+                updateLineNumber(buf, offset, i);
+            } else if (ch == CR) {
+                lineNumber++;
+            }
+        }
+    }
+
+    private void updateLineNumber(final char[] buf, final int offset, final int i) {
+        if (CR != (i > offset ? buf[i - 1] : lastChar)) {
+            lineNumber++;
+        }
     }
 
     /**

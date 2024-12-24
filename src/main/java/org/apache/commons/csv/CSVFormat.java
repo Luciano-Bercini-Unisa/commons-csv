@@ -2280,6 +2280,19 @@ public final class CSVFormat implements Serializable {
         println(appendable);
     }
 
+    private boolean isSpecialCharacter(char c, boolean isCr, boolean isLf, boolean isDelimiterStart) {
+        return isCr || isLf || c == getEscapeChar() || isDelimiterStart;
+    }
+
+    private void handleSpecialCharacter(char c, boolean isLf, boolean isCr, Appendable appendable) throws IOException {
+        if (isLf) {
+            c = 'n';
+        } else if (isCr) {
+            c = 'r';
+        }
+        escape(c, appendable);
+    }
+
     /*
      * Note: Must only be called if escaping is enabled, otherwise can throw exceptions.
      */
@@ -2295,17 +2308,12 @@ public final class CSVFormat implements Serializable {
             final boolean isDelimiterStart = isDelimiter(c, charSeq, pos, delimArray, delimLength);
             final boolean isCr = c == Constants.CR;
             final boolean isLf = c == Constants.LF;
-            if (isCr || isLf || c == escape || isDelimiterStart) {
+            if (isSpecialCharacter(c, isCr, isLf, isDelimiterStart)) {
                 // write out segment up until this char
                 if (pos > start) {
                     appendable.append(charSeq, start, pos);
                 }
-                if (isLf) {
-                    c = 'n';
-                } else if (isCr) {
-                    c = 'r';
-                }
-                escape(c, appendable);
+                handleSpecialCharacter(c, isLf, isCr, appendable);
                 if (isDelimiterStart) {
                     for (int i = 1; i < delimLength; i++) {
                         pos++;
@@ -2345,19 +2353,14 @@ public final class CSVFormat implements Serializable {
             final boolean isDelimiterStart = isDelimiter((char) c, test, pos, delimArray, delimLength);
             final boolean isCr = c == Constants.CR;
             final boolean isLf = c == Constants.LF;
-            if (isCr || isLf || c == escape || isDelimiterStart) {
+            if (isSpecialCharacter((char) c, isCr, isLf, isDelimiterStart)) {
                 // write out segment up until this char
                 if (pos > start) {
                     append(builder.substring(start, pos), appendable);
                     builder.setLength(0);
                     pos = -1;
                 }
-                if (isLf) {
-                    c = 'n';
-                } else if (isCr) {
-                    c = 'r';
-                }
-                escape((char) c, appendable);
+                handleSpecialCharacter((char) c, isLf, isCr, appendable);
                 if (isDelimiterStart) {
                     for (int i = 1; i < delimLength; i++) {
                         escape((char) bufferedReader.read(), appendable);
@@ -2543,26 +2546,26 @@ public final class CSVFormat implements Serializable {
         return getTrim() ? value.trim() : value;
     }
 
-    /**
-     * Verifies the validity and consistency of the attributes, and throws an {@link IllegalArgumentException} if necessary.
-     * <p>
-     * Because an instance can be used for both writing and parsing, not all conditions can be tested here. For example, allowMissingColumnNames is only used
-     * for parsing, so it cannot be used here.
-     * </p>
-     *
-     * @throws IllegalArgumentException Throw when any attribute is invalid or inconsistent with other attributes.
-     */
-    private void validate() throws IllegalArgumentException {
+    private void validateDelimiter() {
         if (containsLineBreak(delimiter)) {
             throw new IllegalArgumentException("The delimiter cannot be a line break");
         }
-        if (quoteCharacter != null && contains(delimiter, quoteCharacter.charValue())) {  // N.B. Explicit (un)boxing is intentional
+    }
+
+    private void validateQuoteAndEscapeCharacters() {
+        if (quoteCharacter != null && contains(delimiter, quoteCharacter.charValue())) {
             throw new IllegalArgumentException("The quoteChar character and the delimiter cannot be the same ('" + quoteCharacter + "')");
         }
-        if (escapeCharacter != null && contains(delimiter, escapeCharacter.charValue())) { // N.B. Explicit (un)boxing is intentional
+        if (escapeCharacter != null && contains(delimiter, escapeCharacter.charValue())) {
             throw new IllegalArgumentException("The escape character and the delimiter cannot be the same ('" + escapeCharacter + "')");
         }
-        if (commentMarker != null && contains(delimiter, commentMarker.charValue())) { // N.B. Explicit (un)boxing is intentional
+        if (escapeCharacter == null && quoteMode == QuoteMode.NONE) {
+            throw new IllegalArgumentException("Quote mode set to NONE but no escape character is set");
+        }
+    }
+
+    private void validateCommentMarker() {
+        if (commentMarker != null && contains(delimiter, commentMarker.charValue())) {
             throw new IllegalArgumentException("The comment start character and the delimiter cannot be the same ('" + commentMarker + "')");
         }
         if (quoteCharacter != null && quoteCharacter.equals(commentMarker)) {
@@ -2571,10 +2574,9 @@ public final class CSVFormat implements Serializable {
         if (escapeCharacter != null && escapeCharacter.equals(commentMarker)) {
             throw new IllegalArgumentException("The comment start and the escape character cannot be the same ('" + commentMarker + "')");
         }
-        if (escapeCharacter == null && quoteMode == QuoteMode.NONE) {
-            throw new IllegalArgumentException("Quote mode set to NONE but no escape character is set");
-        }
-        // Validate headers
+    }
+
+    private void validateHeaders() {
         if (headers != null && duplicateHeaderMode != DuplicateHeaderMode.ALLOW_ALL) {
             final Set<String> dupCheckSet = new HashSet<>(headers.length);
             final boolean emptyDuplicatesAllowed = duplicateHeaderMode == DuplicateHeaderMode.ALLOW_EMPTY;
@@ -2590,5 +2592,21 @@ public final class CSVFormat implements Serializable {
                 }
             }
         }
+    }
+
+    /**
+     * Verifies the validity and consistency of the attributes, and throws an {@link IllegalArgumentException} if necessary.
+     * <p>
+     * Because an instance can be used for both writing and parsing, not all conditions can be tested here. For example, allowMissingColumnNames is only used
+     * for parsing, so it cannot be used here.
+     * </p>
+     *
+     * @throws IllegalArgumentException Throw when any attribute is invalid or inconsistent with other attributes.
+     */
+    private void validate() throws IllegalArgumentException {
+        validateDelimiter();
+        validateQuoteAndEscapeCharacters();
+        validateCommentMarker();
+        validateHeaders();
     }
 }

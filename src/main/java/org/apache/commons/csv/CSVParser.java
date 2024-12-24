@@ -143,13 +143,14 @@ import org.apache.commons.io.function.Uncheck;
  */
 public final class CSVParser implements Iterable<CSVRecord>, Closeable {
 
+    private static final String FORMAT = "format";
     /**
      * Builds a new {@link CSVParser}.
      *
      * @since 1.13.0
      */
     public static class Builder extends AbstractStreamBuilder<CSVParser, Builder> {
-
+        
         private CSVFormat format;
         private long characterOffset;
         private long recordNumber = 1;
@@ -328,7 +329,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
     public static CSVParser parse(final InputStream inputStream, final Charset charset, final CSVFormat format)
             throws IOException {
         Objects.requireNonNull(inputStream, "inputStream");
-        Objects.requireNonNull(format, "format");
+        Objects.requireNonNull(format, FORMAT);
         return parse(new InputStreamReader(inputStream, charset), format);
     }
 
@@ -352,7 +353,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
     @SuppressWarnings("resource")
     public static CSVParser parse(final Path path, final Charset charset, final CSVFormat format) throws IOException {
         Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(format, "format");
+        Objects.requireNonNull(format, FORMAT);
         return parse(Files.newInputStream(path), charset, format);
     }
 
@@ -396,7 +397,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
      */
     public static CSVParser parse(final String string, final CSVFormat format) throws IOException {
         Objects.requireNonNull(string, "string");
-        Objects.requireNonNull(format, "format");
+        Objects.requireNonNull(format, FORMAT);
         return parse(new StringReader(string), format);
     }
 
@@ -508,7 +509,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
     public CSVParser(final Reader reader, final CSVFormat format, final long characterOffset, final long recordNumber)
         throws IOException {
         Objects.requireNonNull(reader, "reader");
-        Objects.requireNonNull(format, "format");
+        Objects.requireNonNull(format, FORMAT);
         this.format = format.copy();
         this.lexer = new Lexer(format, new ExtendedBufferedReader(reader));
         this.csvRecordIterator = new CSVRecordIterator();
