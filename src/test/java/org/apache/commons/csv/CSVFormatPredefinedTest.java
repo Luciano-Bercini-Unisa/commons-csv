@@ -33,42 +33,42 @@ class CSVFormatPredefinedTest {
 
     @Test
     void testDefault() {
-        test(CSVFormat.DEFAULT, "Default");
+        test(CSVFormat.DEFAULT, "DEFAULT");
     }
 
     @Test
     void testExcel() {
-        test(CSVFormat.EXCEL, "Excel");
+        test(CSVFormat.EXCEL, "EXCEL");
     }
 
     @Test
     void testMongoDbCsv() {
-        test(CSVFormat.MONGODB_CSV, "MongoDBCsv");
+        test(CSVFormat.MONGODB_CSV, "MONGODB_CSV");
     }
 
     @Test
     void testMongoDbTsv() {
-        test(CSVFormat.MONGODB_TSV, "MongoDBTsv");
+        test(CSVFormat.MONGODB_TSV, "MONGODB_TSV");
     }
 
     @Test
     void testMySQL() {
-        test(CSVFormat.MYSQL, "MySQL");
+        test(CSVFormat.MYSQL, "MYSQL");
     }
 
     @Test
     void testOracle() {
-        test(CSVFormat.ORACLE, "Oracle");
+        test(CSVFormat.ORACLE, "ORACLE");
     }
 
     @Test
     void testPostgreSqlCsv() {
-        test(CSVFormat.POSTGRESQL_CSV, "PostgreSQLCsv");
+        test(CSVFormat.POSTGRESQL_CSV, "POSTGRESQL_CSV");
     }
 
     @Test
     void testPostgreSqlText() {
-        test(CSVFormat.POSTGRESQL_TEXT, "PostgreSQLText");
+        test(CSVFormat.POSTGRESQL_TEXT, "POSTGRESQL_TEXT");
     }
 
     @Test

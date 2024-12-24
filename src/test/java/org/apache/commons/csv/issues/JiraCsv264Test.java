@@ -17,6 +17,7 @@
 
 package org.apache.commons.csv.issues;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
@@ -70,7 +71,8 @@ import org.junit.jupiter.api.Test;
             .get();
 
         try (StringReader reader = new StringReader(CSV_STRING_GAP); final CSVParser parser = csvFormat.parse(reader)) {
-            // empty
+            // Assert headers are correctly parsed
+            assertArrayEquals(new String[]{"A", "B", "", "", "E"}, parser.getHeaderNames().toArray());
         }
     }
 

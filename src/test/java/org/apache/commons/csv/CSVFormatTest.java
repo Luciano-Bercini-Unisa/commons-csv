@@ -876,7 +876,7 @@ class CSVFormatTest {
     @Test
     void testToStringAndWithCommentMarkerTakingCharacter() {
 
-        final CSVFormat.Predefined csvFormat_Predefined = CSVFormat.Predefined.Default;
+        final CSVFormat.Predefined csvFormat_Predefined = CSVFormat.Predefined.DEFAULT;
         final CSVFormat csvFormat = csvFormat_Predefined.getFormat();
 
         assertNull(csvFormat.getEscapeCharacter());

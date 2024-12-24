@@ -829,14 +829,14 @@ public final class CSVFormat implements Serializable {
          *
          * @see CSVFormat#DEFAULT
          */
-        Default(DEFAULT),
+        DEFAULT(CSVFormat.DEFAULT),
 
         /**
          * The EXCEL predefined format.
          *
          * @see CSVFormat#EXCEL
          */
-        Excel(EXCEL),
+        EXCEL(CSVFormat.EXCEL),
 
         /**
          * The INFORMIX_UNLOAD predefined format.
@@ -844,7 +844,7 @@ public final class CSVFormat implements Serializable {
          * @see CSVFormat#INFORMIX_UNLOAD
          * @since 1.3
          */
-        InformixUnload(INFORMIX_UNLOAD),
+        INFORMIX_UNLOAD(CSVFormat.INFORMIX_UNLOAD),
 
         /**
          * The INFORMIX_UNLOAD_CSV predefined format.
@@ -852,7 +852,7 @@ public final class CSVFormat implements Serializable {
          * @see CSVFormat#INFORMIX_UNLOAD_CSV
          * @since 1.3
          */
-        InformixUnloadCsv(INFORMIX_UNLOAD_CSV),
+        INFORMIX_UNLOAD_CSV(CSVFormat.INFORMIX_UNLOAD_CSV),
 
         /**
          * The MONGODB_CSV predefined format.
@@ -860,7 +860,7 @@ public final class CSVFormat implements Serializable {
          * @see CSVFormat#MONGODB_CSV
          * @since 1.7
          */
-        MongoDBCsv(MONGODB_CSV),
+        MONGODB_CSV(CSVFormat.MONGODB_CSV),
 
         /**
          * The MONGODB_TSV predefined format.
@@ -868,21 +868,21 @@ public final class CSVFormat implements Serializable {
          * @see CSVFormat#MONGODB_TSV
          * @since 1.7
          */
-        MongoDBTsv(MONGODB_TSV),
+        MONGODB_TSV(CSVFormat.MONGODB_TSV),
 
         /**
          * The MYSQL predefined format.
          *
          * @see CSVFormat#MYSQL
          */
-        MySQL(MYSQL),
+        MYSQL(CSVFormat.MYSQL),
 
         /**
          * The ORACLE predefined format.
          *
          * @see CSVFormat#ORACLE
          */
-        Oracle(ORACLE),
+        ORACLE(CSVFormat.ORACLE),
 
         /**
          * The POSTGRESQL_CSV predefined format.
@@ -890,14 +890,14 @@ public final class CSVFormat implements Serializable {
          * @see CSVFormat#POSTGRESQL_CSV
          * @since 1.5
          */
-        PostgreSQLCsv(POSTGRESQL_CSV),
+        POSTGRESQL_CSV(CSVFormat.POSTGRESQL_CSV),
 
         /**
          * The POSTGRESQL_TEXT predefined format.
          *
          * @see CSVFormat#POSTGRESQL_TEXT
          */
-        PostgreSQLText(POSTGRESQL_TEXT),
+        POSTGRESQL_TEXT(CSVFormat.POSTGRESQL_TEXT),
 
         /**
          * The RFC4180 predefined format.
@@ -944,7 +944,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL)}</li>
      * </ul>
      *
-     * @see Predefined#Default
+     * @see Predefined#DEFAULT
      */
     public static final CSVFormat DEFAULT = new CSVFormat(Constants.COMMA, Constants.DOUBLE_QUOTE_CHAR, null, null, null, false, true, Constants.CRLF, null,
             null, null, false, false, false, false, false, false, DuplicateHeaderMode.ALLOW_ALL, false, false);
@@ -979,7 +979,7 @@ public final class CSVFormat implements Serializable {
      * {@link Builder#setIgnoreEmptyLines(boolean) Builder#setIgnoreEmptyLines(false)}.
      * </p>
      *
-     * @see Predefined#Excel
+     * @see Predefined#EXCEL
      */
     // @formatter:off
     public static final CSVFormat EXCEL = DEFAULT.builder()
@@ -1008,7 +1008,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setRecordSeparator('\n')}</li>
      * </ul>
      *
-     * @see Predefined#MySQL
+     * @see Predefined#MYSQL
      * @see <a href= "http://www.ibm.com/support/knowledgecenter/SSBJG3_2.5.0/com.ibm.gen_busug.doc/c_fgl_InOutSql_UNLOAD.htm">
      * http://www.ibm.com/support/knowledgecenter/SSBJG3_2.5.0/com.ibm.gen_busug.doc/c_fgl_InOutSql_UNLOAD.htm</a>
      * @since 1.3
@@ -1039,7 +1039,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setRecordSeparator('\n')}</li>
      * </ul>
      *
-     * @see Predefined#MySQL
+     * @see Predefined#MYSQL
      * @see <a href= "http://www.ibm.com/support/knowledgecenter/SSBJG3_2.5.0/com.ibm.gen_busug.doc/c_fgl_InOutSql_UNLOAD.htm">
      * http://www.ibm.com/support/knowledgecenter/SSBJG3_2.5.0/com.ibm.gen_busug.doc/c_fgl_InOutSql_UNLOAD.htm</a>
      * @since 1.3
@@ -1080,7 +1080,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setSkipHeaderRecord(false)}</li>
      * </ul>
      *
-     * @see Predefined#MongoDBCsv
+     * @see Predefined#MONGODB_CSV
      * @see <a href="https://docs.mongodb.com/manual/reference/program/mongoexport/">MongoDB mongoexport command documentation</a>
      * @since 1.7
      */
@@ -1116,7 +1116,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setSkipHeaderRecord(false)}</li>
      * </ul>
      *
-     * @see Predefined#MongoDBCsv
+     * @see Predefined#MONGODB_TSV
      * @see <a href="https://docs.mongodb.com/manual/reference/program/mongoexport/">MongoDB mongoexport command
      *          documentation</a>
      * @since 1.7
@@ -1152,7 +1152,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setQuoteMode(QuoteMode.ALL_NON_NULL)}</li>
      * </ul>
      *
-     * @see Predefined#MySQL
+     * @see Predefined#MYSQL
      * @see <a href="https://dev.mysql.com/doc/refman/5.1/en/load-data.html"> https://dev.mysql.com/doc/refman/5.1/en/load
      *      -data.html</a>
      */
@@ -1191,7 +1191,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setQuoteMode(QuoteMode.MINIMAL)}</li>
      * </ul>
      *
-     * @see Predefined#Oracle
+     * @see Predefined#ORACLE
      * @see <a href="https://s.apache.org/CGXG">Oracle CSV Format Specification</a>
      * @since 1.6
      */
@@ -1229,7 +1229,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setQuoteMode(QuoteMode.ALL_NON_NULL)}</li>
      * </ul>
      *
-     * @see Predefined#MySQL
+     * @see Predefined#MYSQL
      * @see <a href="https://www.postgresql.org/docs/current/static/sql-copy.html">PostgreSQL COPY command
      *          documentation</a>
      * @since 1.5
@@ -1267,7 +1267,7 @@ public final class CSVFormat implements Serializable {
      * <li>{@code setQuoteMode(QuoteMode.ALL_NON_NULL)}</li>
      * </ul>
      *
-     * @see Predefined#MySQL
+     * @see Predefined#MYSQL
      * @see <a href="https://www.postgresql.org/docs/current/static/sql-copy.html">PostgreSQL COPY command
      *          documentation</a>
      * @since 1.5

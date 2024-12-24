@@ -24,8 +24,11 @@ import java.nio.file.Files;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests https://issues.apache.org/jira/browse/CSV-213
@@ -51,10 +54,10 @@ import org.junit.jupiter.api.Test;
         try (Reader reader = Files.newBufferedReader(csvFile.toPath(), StandardCharsets.UTF_8);
             CSVParser parser = csvFormat.parse(reader)) {
             if (parser.iterator().hasNext()) {
-                // System.out.println(parser.getCurrentLineNumber());
-                // System.out.println(parser.getRecordNumber());
-                // get only first record we don't need other's
-                parser.iterator().next(); // this fails
+                // Get the first record
+                CSVRecord firstRecord = parser.iterator().next(); // This fails
+                // Assert that the record is not null
+                assertNotNull(firstRecord, "The first record should not be null.");
             }
         } catch (final IOException e) {
             throw new IllegalStateException("Error while adding end channel to CSV", e);

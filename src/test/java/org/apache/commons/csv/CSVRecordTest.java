@@ -16,16 +16,6 @@
  */
 package org.apache.commons.csv;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +33,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
- class CSVRecordTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class CSVRecordTest {
 
     private enum EnumFixture {
         UNKNOWN_COLUMN
@@ -358,7 +350,8 @@ import org.junit.jupiter.api.Test;
      void testToMapWithShortRecord() throws Exception {
         try (final CSVParser parser = CSVParser.parse("a,b", CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get())) {
             final CSVRecord shortRec = parser.iterator().next();
-            shortRec.toMap();
+            // Ensure that toMap() does not throw an exception
+            assertDoesNotThrow(shortRec::toMap);
         }
     }
 
