@@ -128,18 +128,28 @@ class CSVFormatTest {
 
 
     @Test
-    void testDuplicateHeaderElementsTrueContainsEmpty1() {
-        CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader("A", "", "B", "").get();
+    void testDuplicateHeaderElementsTrueContainsEmpty() {
+        String[] header = new String[]{"A", "", "B", ""};
+        CSVFormat format =
+                CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader(header).get();
+        // Assert that the header contains the expected elements.
+        assertArrayEquals(header, format.getHeader(), "Headers should allow duplicates");
+        // Assert that duplicate header mode is ALLOW_EMPTY.
+        assertEquals(DuplicateHeaderMode.ALLOW_EMPTY, format.getDuplicateHeaderMode());
     }
 
     @Test
     void testDuplicateHeaderElementsTrueContainsEmpty2() {
-        CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setHeader("A", "", "B", "").get();
-    }
-
-    @Test
-    void testDuplicateHeaderElementsTrueContainsEmpty3() {
-        CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).setAllowMissingColumnNames(true).setHeader("A", "", "B", "").get();
+        String[] header = new String[]{"A", "", "B", ""};
+        CSVFormat format =
+                CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).
+                        setAllowMissingColumnNames(true).setHeader(header).get();
+        // Assert that the header contains the expected elements
+        assertArrayEquals(header, format.getHeader(), "Headers should allow duplicates");
+        // Assert that duplicate header mode is ALLOW_EMPTY
+        assertEquals(DuplicateHeaderMode.ALLOW_EMPTY, format.getDuplicateHeaderMode());
+        // Assert that missing column names are allowed
+        assertTrue(format.getAllowMissingColumnNames());
     }
 
     @Test
@@ -644,9 +654,13 @@ class CSVFormatTest {
 
     @Test
     void testJiraCsv236() {
-        CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).setHeader("CC", "VV", "VV").get();
+        String[] header = new String[]{"CC", "VV", "VV"};
+        CSVFormat format = CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).setHeader(header).get();
+        // Assert that the header contains the expected elements
+        assertArrayEquals(header, format.getHeader());
+        // Assert that duplicate header mode is ALLOW_ALL
+        assertEquals(DuplicateHeaderMode.ALLOW_ALL, format.getDuplicateHeaderMode());
     }
-
 
     @Test
     void testNewFormat() {
@@ -1285,14 +1299,22 @@ class CSVFormatTest {
     void testWithHeaderEnumNull() {
         final CSVFormat format = CSVFormat.DEFAULT;
         final Class<Enum<?>> simpleName = null;
-        format.builder().setHeader(simpleName).get();
+        CSVFormat updatedFormat = format.builder()
+                .setHeader(simpleName)
+                .get();
+        // Assert that the header is null (as no header is explicitly set)
+        assertNull(updatedFormat.getHeader());
     }
 
     @Test
     void testWithHeaderResultSetNull() throws SQLException {
         final CSVFormat format = CSVFormat.DEFAULT;
         final ResultSet resultSet = null;
-        format.builder().setHeader(resultSet).get();
+        CSVFormat updatedFormat = format.builder()
+                .setHeader(resultSet)
+                .get();
+        // Assert that the header is null (as no header is explicitly set)
+        assertNull(updatedFormat.getHeader());
     }
 
     @Test

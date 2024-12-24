@@ -431,7 +431,20 @@ class CSVParserTest {
     @Test
     void testDuplicateHeadersAllowedByDefault() throws Exception {
         try (CSVParser parser = CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader().get())) {
-            // noop
+            // Assert that duplicate headers are allowed and correctly parsed
+            assertArrayEquals(new String[]{"a", "b", "a"}, parser.getHeaderNames().toArray());
+            // The first row is the headers and then there are two rows of data; assert that data rows are parsed correctly
+            List<CSVRecord> records = parser.getRecords();
+            assertEquals(2, records.size()); // Two data rows
+
+            // Verify the content of the rows
+            assertEquals("1", records.get(0).get(0)); // First column, first row
+            assertEquals("2", records.get(0).get(1)); // Second column, first row
+            assertEquals("3", records.get(0).get(2)); // Third column, first row
+
+            assertEquals("x", records.get(1).get(0)); // First column, second row
+            assertEquals("y", records.get(1).get(1)); // Second column, second row
+            assertEquals("z", records.get(1).get(2)); // Third column, second row
         }
     }
 
@@ -988,8 +1001,10 @@ class CSVParserTest {
     @Test
     void testHeaderMissingWithNull() throws Exception {
         final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setNullString("").get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
-            parser.iterator();
+        try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setNullString("")
+                .get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
+            // Ensure iterator does not throw an exception
+            assertDoesNotThrow(parser::iterator);
         }
     }
 
@@ -997,7 +1012,8 @@ class CSVParserTest {
     void testHeadersMissing() throws Exception {
         try (final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
              final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
-            parser.iterator();
+            // Ensure iterator does not throw an exception
+            assertDoesNotThrow(parser::iterator);
         }
     }
 
