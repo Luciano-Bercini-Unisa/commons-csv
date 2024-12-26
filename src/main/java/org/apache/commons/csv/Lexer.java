@@ -249,16 +249,7 @@ final class Lexer implements Closeable {
             // don't set token.isReady here because no content
             return token;
         }
-        if (isStartOfLine(lastChar) && isCommentStart(c)) {
-            final String line = reader.readLine();
-            if (line == null) {
-                token.type = Token.Type.EOF;
-                // don't set token.isReady here because no content
-                return token;
-            }
-            final String comment = line.trim();
-            token.content.append(comment);
-            token.type = Token.Type.COMMENT;
+        if (isStartOfLineComment(token, lastChar, c)) {
             return token;
         }
         // Important: make sure a new char gets consumed in each iteration
@@ -273,6 +264,22 @@ final class Lexer implements Closeable {
             processTokenType(token, c, eol);
         }
         return token;
+    }
+    
+    private boolean isStartOfLineComment(Token token, int lastChar, int c) throws IOException {
+        if (isStartOfLine(lastChar) && isCommentStart(c)) {
+            final String line = reader.readLine();
+            if (line == null) {
+                token.type = Token.Type.EOF;
+                // don't set token.isReady here because no content
+                return true;
+            }
+            final String comment = line.trim();
+            token.content.append(comment);
+            token.type = Token.Type.COMMENT;
+            return true;
+        }
+        return false;
     }
 
     private void processTokenType(Token token, int c, boolean eol) throws IOException {
@@ -334,7 +341,6 @@ final class Lexer implements Closeable {
         int c;
         while (true) {
             c = reader.read();
-
             if (isQuoteChar(c)) {
                 if (isQuoteChar(reader.peek())) {
                     // double or escaped encapsulator -> add single encapsulator to token
@@ -344,17 +350,7 @@ final class Lexer implements Closeable {
                     // token finish mark (encapsulator) reached: ignore whitespace till delimiter
                     while (true) {
                         c = reader.read();
-                        if (isDelimiter(c)) {
-                            token.type = Token.Type.TOKEN;
-                            return token;
-                        }
-                        if (isEndOfFile(c)) {
-                            token.type = Token.Type.EOF;
-                            token.isReady = true; // There is data at EOF
-                            return token;
-                        }
-                        if (readEndOfLine(c)) {
-                            token.type = Token.Type.EORECORD;
+                        if (handleDelimiters(token, c)) {
                             return token;
                         }
                         if (trailingData) {
@@ -381,6 +377,23 @@ final class Lexer implements Closeable {
                 token.content.append((char) c);
             }
         }
+    }
+    
+    private boolean handleDelimiters(Token token, int c) throws IOException {
+        if (isDelimiter(c)) {
+            token.type = Token.Type.TOKEN;
+            return true;
+        }
+        if (isEndOfFile(c)) {
+            token.type = Token.Type.EOF;
+            token.isReady = true; // There is data at EOF
+            return true;
+        }
+        if (readEndOfLine(c)) {
+            token.type = Token.Type.EORECORD;
+            return true;
+        }
+        return false;
     }
 
     /**

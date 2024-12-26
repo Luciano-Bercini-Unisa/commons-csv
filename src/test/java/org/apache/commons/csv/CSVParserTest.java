@@ -1222,11 +1222,12 @@ class CSVParserTest {
 
     @Test
     void testNewCSVParserNullReaderFormat() {
-        assertThrows(NullPointerException.class, () -> new CSVParser(null, CSVFormat.DEFAULT));
+        assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(null).setFormat(CSVFormat.DEFAULT).get());
     }
 
     @Test
     void testNewCSVParserReaderNullFormat() {
+//        assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(new StringReader("")).setFormat(null).get());
         assertThrows(NullPointerException.class, () -> new CSVParser(new StringReader(""), null));
     }
 
@@ -1299,14 +1300,17 @@ class CSVParserTest {
             parseFully(parser);
         }
         // InputStreamReader
-        try (final CSVParser parser = new CSVParser(new InputStreamReader(url.openStream(), charset), format)) {
+
+        try (final CSVParser parser = CSVParser.builder().setReader(new InputStreamReader(url.openStream(), charset)).setFormat(format).get()) {
             parseFully(parser);
         }
         try (final CSVParser parser = CSVParser.builder().setReader(new InputStreamReader(url.openStream(), charset)).setFormat(format).get()) {
             parseFully(parser);
         }
         // InputStreamReader with longs
-        try (final CSVParser parser = new CSVParser(new InputStreamReader(url.openStream(), charset), format, /* characterOffset= */0, /* recordNumber= */1)) {
+
+        try (final CSVParser parser = CSVParser.builder().setReader(new InputStreamReader(url.openStream(), charset)).
+                setFormat(format).setCharacterOffset(0).setRecordNumber(1).get()) {
             parseFully(parser);
         }
         try (final CSVParser parser = CSVParser.builder().setReader(new InputStreamReader(url.openStream(), charset)).setFormat(format).setCharacterOffset(0)
@@ -1424,8 +1428,7 @@ class CSVParserTest {
             fail("Parsing should not throw an exception, but it did: " + e.getMessage());
         }
     }
-    
-    
+
 
     @Test
     void testParseWithQuoteWithEscape() throws IOException {

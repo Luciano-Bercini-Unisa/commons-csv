@@ -1709,10 +1709,10 @@ public final class CSVFormat implements Serializable {
      * @return the formatted values
      */
     public String format(final Object... values) {
-        return Uncheck.get(() -> format_(values));
+        return Uncheck.get(() -> formatChecked(values));
     }
 
-    private String format_(final Object... values) throws IOException {
+    private String formatChecked(final Object... values) throws IOException {
         final StringWriter out = new StringWriter();
         try (CSVPrinter csvPrinter = new CSVPrinter(out, this)) {
             csvPrinter.printRecord(values);
@@ -2294,7 +2294,6 @@ public final class CSVFormat implements Serializable {
         final int end = charSeq.length();
         final char[] delimArray = getDelimiterCharArray();
         final int delimLength = delimArray.length;
-        final char escape = getEscapeChar();
         while (pos < end) {
             char c = charSeq.charAt(pos);
             final boolean isDelimiterStart = isDelimiter(c, charSeq, pos, delimArray, delimLength);
@@ -2333,7 +2332,6 @@ public final class CSVFormat implements Serializable {
         final ExtendedBufferedReader bufferedReader = new ExtendedBufferedReader(reader);
         final char[] delimArray = getDelimiterCharArray();
         final int delimLength = delimArray.length;
-        final char escape = getEscapeChar();
         final StringBuilder builder = new StringBuilder(IOUtils.DEFAULT_BUFFER_SIZE);
         int c;
         final char[] lookAheadBuffer = new char[delimLength - 1];
@@ -2341,7 +2339,7 @@ public final class CSVFormat implements Serializable {
             builder.append((char) c);
             Arrays.fill(lookAheadBuffer, (char) 0);
             bufferedReader.peek(lookAheadBuffer);
-            final String test = builder.toString() + new String(lookAheadBuffer);
+            final String test = builder + new String(lookAheadBuffer);
             final boolean isDelimiterStart = isDelimiter((char) c, test, pos, delimArray, delimLength);
             final boolean isCr = c == Constants.CR;
             final boolean isLf = c == Constants.LF;
