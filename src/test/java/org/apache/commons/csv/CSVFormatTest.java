@@ -51,7 +51,7 @@ class CSVFormatTest {
     }
 
     enum Header {
-        Name, Email, Phone
+        NAME, EMAIL, PHONE
     }
 
     private static void assertNotEquals(final Object right, final Object left) {
@@ -1292,7 +1292,7 @@ class CSVFormatTest {
     @Test
     void testWithHeaderEnum() {
         final CSVFormat formatWithHeader = CSVFormat.DEFAULT.builder().setHeader(Header.class).get();
-        assertArrayEquals(new String[]{"Name", "Email", "Phone"}, formatWithHeader.getHeader());
+        assertArrayEquals(new String[]{"NAME", "EMAIL", "PHONE"}, formatWithHeader.getHeader());
     }
 
     @Test

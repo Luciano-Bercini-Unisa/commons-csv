@@ -69,8 +69,7 @@ class CSVParserTest {
     private static final String UTF_8_NAME = UTF_8.name();
 
     private static final String CSV_INPUT = "a,b,c,d\n" + " a , b , 1 2 \n" + "\"foo baar\", b,\n" +
-            // + " \"foo\n,,\n\"\",,\n\\\"\",d,e\n";
-            "   \"foo\n,,\n\"\",,\n\"\"\",d,e\n"; // changed to use standard CSV escaping
+            "   \"foo\n,,\n\"\",,\n\"\"\",d,e\n"; // Using standard CSV escaping
 
     private static final String CSV_INPUT_1 = "a,b,c,d";
 
@@ -216,7 +215,7 @@ class CSVParserTest {
     void testBOM() throws IOException {
         final URL url = ClassLoader.getSystemClassLoader().getResource("org/apache/commons/csv/CSVFileParser/bom.csv");
         try (final CSVParser parser = CSVParser.parse(url, StandardCharsets.UTF_8, EXCEL_WITH_HEADER)) {
-            parser.forEach(record -> assertNotNull(record.get("Date")));
+            parser.forEach(myRecord -> assertNotNull(myRecord.get("Date")));
         }
     }
 
@@ -224,7 +223,7 @@ class CSVParserTest {
     void testBOMInputStreamParserWithInputStream() throws IOException {
         try (final BOMInputStream inputStream = createBOMInputStream("org/apache/commons/csv/CSVFileParser/bom.csv");
              final CSVParser parser = CSVParser.parse(inputStream, UTF_8, EXCEL_WITH_HEADER)) {
-            parser.forEach(record -> assertNotNull(record.get("Date")));
+            parser.forEach(myRecord -> assertNotNull(myRecord.get("Date")));
         }
     }
 
@@ -235,7 +234,7 @@ class CSVParserTest {
                      .setReader(reader)
                      .setFormat(EXCEL_WITH_HEADER)
                      .get()) {
-            parser.forEach(record -> assertNotNull(record.get("Date")));
+            parser.forEach(myRecord -> assertNotNull(myRecord.get("Date")));
         }
     }
 
@@ -246,7 +245,7 @@ class CSVParserTest {
                      .setReader(reader)
                      .setFormat(EXCEL_WITH_HEADER)
                      .get()) {
-            parser.forEach(record -> assertNotNull(record.get("Date")));
+            parser.forEach(myRecord -> assertNotNull(myRecord.get("Date")));
         }
     }
 
@@ -314,27 +313,27 @@ class CSVParserTest {
         final Path path = Paths.get("src/test/resources/org/apache/commons/csv/CSV-141/csv-141.csv");
         try (final CSVParser parser = CSVParser.parse(path, StandardCharsets.UTF_8, format)) {
             // row 1
-            CSVRecord record = parse(parser, failParseRecordNo);
-            if (record == null) {
+            CSVRecord myRecord = parse(parser, failParseRecordNo);
+            if (myRecord == null) {
                 return; // expected failure
             }
-            assertEquals("1414770317901", record.get(0));
-            assertEquals("android.widget.EditText", record.get(1));
-            assertEquals("pass sem1 _84*|*", record.get(2));
-            assertEquals("0", record.get(3));
-            assertEquals("pass sem1 _8", record.get(4));
-            assertEquals(5, record.size());
+            assertEquals("1414770317901", myRecord.get(0));
+            assertEquals("android.widget.EditText", myRecord.get(1));
+            assertEquals("pass sem1 _84*|*", myRecord.get(2));
+            assertEquals("0", myRecord.get(3));
+            assertEquals("pass sem1 _8", myRecord.get(4));
+            assertEquals(5, myRecord.size());
             // row 2
-            record = parse(parser, failParseRecordNo);
-            if (record == null) {
+            myRecord = parse(parser, failParseRecordNo);
+            if (myRecord == null) {
                 return; // expected failure
             }
-            assertEquals("1414770318470", record.get(0));
-            assertEquals("android.widget.EditText", record.get(1));
-            assertEquals("pass sem1 _84:|", record.get(2));
-            assertEquals("0", record.get(3));
-            assertEquals("pass sem1 _84:\\", record.get(4));
-            assertEquals(5, record.size());
+            assertEquals("1414770318470", myRecord.get(0));
+            assertEquals("android.widget.EditText", myRecord.get(1));
+            assertEquals("pass sem1 _84:|", myRecord.get(2));
+            assertEquals("0", myRecord.get(3));
+            assertEquals("pass sem1 _84:\\", myRecord.get(4));
+            assertEquals(5, myRecord.size());
             // row 3: Fail for certain
             assertThrows(IOException.class, () -> parser.nextRecord());
         }
@@ -344,34 +343,34 @@ class CSVParserTest {
         final Path path = Paths.get("src/test/resources/org/apache/commons/csv/CSV-141/csv-141.csv");
         try (final CSVParser parser = CSVParser.parse(path, StandardCharsets.UTF_8, format)) {
             // row 1
-            CSVRecord record = parser.nextRecord();
-            assertEquals("1414770317901", record.get(0));
-            assertEquals("android.widget.EditText", record.get(1));
-            assertEquals("pass sem1 _84*|*", record.get(2));
-            assertEquals("0", record.get(3));
-            assertEquals("pass sem1 _8", record.get(4));
-            assertEquals(5, record.size());
+            CSVRecord myRecord = parser.nextRecord();
+            assertEquals("1414770317901", myRecord.get(0));
+            assertEquals("android.widget.EditText", myRecord.get(1));
+            assertEquals("pass sem1 _84*|*", myRecord.get(2));
+            assertEquals("0", myRecord.get(3));
+            assertEquals("pass sem1 _8", myRecord.get(4));
+            assertEquals(5, myRecord.size());
             // row 2
-            record = parser.nextRecord();
-            assertEquals("1414770318470", record.get(0));
-            assertEquals("android.widget.EditText", record.get(1));
-            assertEquals("pass sem1 _84:|", record.get(2));
-            assertEquals("0", record.get(3));
-            assertEquals("pass sem1 _84:\\", record.get(4));
-            assertEquals(5, record.size());
+            myRecord = parser.nextRecord();
+            assertEquals("1414770318470", myRecord.get(0));
+            assertEquals("android.widget.EditText", myRecord.get(1));
+            assertEquals("pass sem1 _84:|", myRecord.get(2));
+            assertEquals("0", myRecord.get(3));
+            assertEquals("pass sem1 _84:\\", myRecord.get(4));
+            assertEquals(5, myRecord.size());
             // row 3
-            record = parser.nextRecord();
-            assertEquals("1414770318327", record.get(0));
-            assertEquals("android.widget.EditText", record.get(1));
-            assertEquals("pass sem1\n1414770318628\"", record.get(2));
-            assertEquals("android.widget.EditText", record.get(3));
-            assertEquals("pass sem1 _84*|*", record.get(4));
-            assertEquals("0", record.get(5));
-            assertEquals("pass sem1\n", record.get(6));
-            assertEquals(7, record.size());
+            myRecord = parser.nextRecord();
+            assertEquals("1414770318327", myRecord.get(0));
+            assertEquals("android.widget.EditText", myRecord.get(1));
+            assertEquals("pass sem1\n1414770318628\"", myRecord.get(2));
+            assertEquals("android.widget.EditText", myRecord.get(3));
+            assertEquals("pass sem1 _84*|*", myRecord.get(4));
+            assertEquals("0", myRecord.get(5));
+            assertEquals("pass sem1\n", myRecord.get(6));
+            assertEquals(7, myRecord.size());
             // EOF
-            record = parser.nextRecord();
-            assertNull(record);
+            myRecord = parser.nextRecord();
+            assertNull(myRecord);
         }
     }
 
@@ -385,12 +384,12 @@ class CSVParserTest {
         final String dqString = "\"aaa\",\"b\"\"bb\",\"ccc\""; // "aaa","b""bb","ccc"
         try (final CSVParser parser = CSVFormat.RFC4180.parse(new StringReader(dqString))) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
+            final CSVRecord myRecord = records.next();
             assertFalse(records.hasNext());
-            assertEquals(3, record.size());
-            assertEquals("aaa", record.get(0));
-            assertEquals("b\"bb", record.get(1));
-            assertEquals("ccc", record.get(2));
+            assertEquals(3, myRecord.size());
+            assertEquals("aaa", myRecord.get(0));
+            assertEquals("b\"bb", myRecord.get(1));
+            assertEquals("ccc", myRecord.get(2));
         }
     }
 
@@ -587,10 +586,10 @@ class CSVParserTest {
     void testExcelHeaderCountLessThanData() throws Exception {
         final String code = "A,B,C,,\r\na,b,c,d,e\r\n";
         try (final CSVParser parser = CSVParser.parse(code, EXCEL_WITH_HEADER)) {
-            parser.getRecords().forEach(record -> {
-                assertEquals("a", record.get("A"));
-                assertEquals("b", record.get("B"));
-                assertEquals("c", record.get("C"));
+            parser.getRecords().forEach(myRecord -> {
+                assertEquals("a", myRecord.get("A"));
+                assertEquals("b", myRecord.get("B"));
+                assertEquals("c", myRecord.get("C"));
             });
         }
     }
@@ -630,8 +629,8 @@ class CSVParserTest {
         try (final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
              final CSVParser parser = CSVFormat.DEFAULT.parse(in)) {
             final List<CSVRecord> records = new ArrayList<>();
-            for (final CSVRecord record : parser) {
-                records.add(record);
+            for (final CSVRecord myRecord : parser) {
+                records.add(myRecord);
             }
             assertEquals(3, records.size());
             assertArrayEquals(new String[]{"a", "b", "c"}, records.get(0).values());
@@ -724,10 +723,10 @@ class CSVParserTest {
             // Parse to make sure getHeaderMap did not have a side-effect.
             for (int i = 0; i < 3; i++) {
                 assertTrue(records.hasNext());
-                final CSVRecord record = records.next();
-                assertEquals(record.get(0), record.get("A"));
-                assertEquals(record.get(1), record.get("B"));
-                assertEquals(record.get(2), record.get("C"));
+                final CSVRecord myRecord = records.next();
+                assertEquals(myRecord.get(0), myRecord.get("A"));
+                assertEquals(myRecord.get(1), myRecord.get("B"));
+                assertEquals(myRecord.get(2), myRecord.get("C"));
             }
 
             assertFalse(records.hasNext());
@@ -786,8 +785,8 @@ class CSVParserTest {
     @Test
     void testGetOneLine() throws IOException {
         try (final CSVParser parser = CSVParser.parse(CSV_INPUT_1, CSVFormat.DEFAULT)) {
-            final CSVRecord record = parser.getRecords().get(0);
-            assertArrayEquals(RESULT[0], record.values());
+            final CSVRecord myRecord = parser.getRecords().get(0);
+            assertArrayEquals(RESULT[0], myRecord.values());
         }
     }
 
@@ -864,22 +863,22 @@ class CSVParserTest {
     void testGetRecordWithMultiLineValues() throws Exception {
         try (final CSVParser parser = CSVParser.parse("\"a\r\n1\",\"a\r\n2\"" + CRLF + "\"b\r\n1\",\"b\r\n2\"" + CRLF + "\"c\r\n1\",\"c\r\n2\"",
                 CSVFormat.DEFAULT.builder().setRecordSeparator(CRLF).get())) {
-            CSVRecord record;
+            CSVRecord myRecord;
             assertEquals(0, parser.getRecordNumber());
             assertEquals(0, parser.getCurrentLineNumber());
-            assertNotNull(record = parser.nextRecord());
+            assertNotNull(myRecord = parser.nextRecord());
             assertEquals(3, parser.getCurrentLineNumber());
-            assertEquals(1, record.getRecordNumber());
+            assertEquals(1, myRecord.getRecordNumber());
             assertEquals(1, parser.getRecordNumber());
-            assertNotNull(record = parser.nextRecord());
+            assertNotNull(myRecord = parser.nextRecord());
             assertEquals(6, parser.getCurrentLineNumber());
-            assertEquals(2, record.getRecordNumber());
+            assertEquals(2, myRecord.getRecordNumber());
             assertEquals(2, parser.getRecordNumber());
-            assertNotNull(record = parser.nextRecord());
+            assertNotNull(myRecord = parser.nextRecord());
             assertEquals(9, parser.getCurrentLineNumber());
-            assertEquals(3, record.getRecordNumber());
+            assertEquals(3, myRecord.getRecordNumber());
             assertEquals(3, parser.getRecordNumber());
-            assertNull(record = parser.nextRecord());
+            assertNull(myRecord = parser.nextRecord());
             assertEquals(9, parser.getCurrentLineNumber());
             assertEquals(3, parser.getRecordNumber());
         }
@@ -957,10 +956,10 @@ class CSVParserTest {
 
             for (int i = 0; i < 2; i++) {
                 assertTrue(records.hasNext());
-                final CSVRecord record = records.next();
-                assertEquals(record.get(0), record.get("a"));
-                assertEquals(record.get(1), record.get("b"));
-                assertEquals(record.get(2), record.get("c"));
+                final CSVRecord myRecord = records.next();
+                assertEquals(myRecord.get(0), myRecord.get("a"));
+                assertEquals(myRecord.get(1), myRecord.get("b"));
+                assertEquals(myRecord.get(2), myRecord.get("c"));
             }
 
             assertFalse(records.hasNext());
@@ -974,10 +973,10 @@ class CSVParserTest {
             final Iterator<CSVRecord> records = parser.iterator();
             for (int i = 0; i < 2; i++) {
                 assertTrue(records.hasNext());
-                final CSVRecord record = records.next();
-                assertEquals(record.get(0), record.get("a"));
-                assertEquals(record.get(1), record.get("b"));
-                assertEquals(record.get(2), record.get("c"));
+                final CSVRecord myRecord = records.next();
+                assertEquals(myRecord.get(0), myRecord.get("a"));
+                assertEquals(myRecord.get(1), myRecord.get("b"));
+                assertEquals(myRecord.get(2), myRecord.get("c"));
             }
             assertFalse(records.hasNext());
         }
@@ -990,9 +989,9 @@ class CSVParserTest {
             final Iterator<CSVRecord> records = parser.iterator();
             for (int i = 0; i < 2; i++) {
                 assertTrue(records.hasNext());
-                final CSVRecord record = records.next();
-                assertEquals(record.get(0), record.get("a"));
-                assertEquals(record.get(2), record.get("c"));
+                final CSVRecord myRecord = records.next();
+                assertEquals(myRecord.get(0), myRecord.get("a"));
+                assertEquals(myRecord.get(2), myRecord.get("c"));
             }
             assertFalse(records.hasNext());
         }
@@ -1034,9 +1033,9 @@ class CSVParserTest {
         final Reader in = new StringReader("header1,null,header3\n1,2,3\n4,5,6");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().builder().setNullString("null").get().builder().setAllowMissingColumnNames(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
+            final CSVRecord myRecord = records.next();
             // Expect the null header to be missing
-            @SuppressWarnings("resource") final CSVParser recordParser = record.getParser();
+            @SuppressWarnings("resource") final CSVParser recordParser = myRecord.getParser();
             assertEquals(Arrays.asList("header1", "header3"), recordParser.getHeaderNames());
             assertEquals(2, recordParser.getHeaderMap().size());
         }
@@ -1047,18 +1046,16 @@ class CSVParserTest {
         final Reader reader = new StringReader("1,2,3");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("One", "TWO", "three").get().builder().setIgnoreHeaderCase(true).get().parse(reader)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("one"));
-            assertEquals("2", record.get("two"));
-            assertEquals("3", record.get("THREE"));
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("one"));
+            assertEquals("2", myRecord.get("two"));
+            assertEquals("3", myRecord.get("THREE"));
         }
     }
 
     @Test
     void testIgnoreEmptyLines() throws IOException {
         final String code = "\nfoo,baar\n\r\n,\n\n,world\r\n\n";
-        // String code = "world\r\n\n";
-        // String code = "foo;baar\r\n\r\nhello;\r\n\r\nworld;\r\n";
         try (final CSVParser parser = CSVParser.parse(code, CSVFormat.DEFAULT)) {
             final List<CSVRecord> records = parser.getRecords();
             assertEquals(3, records.size());
@@ -1096,49 +1093,49 @@ class CSVParserTest {
             final Iterator<CSVRecord> iter = parser.iterator();
             int recordNumber = 0;
             while (iter.hasNext()) {
-                final CSVRecord record = iter.next();
+                final CSVRecord myRecord = iter.next();
                 recordNumber++;
-                assertEquals(String.valueOf(recordNumber), record.get(0));
+                assertEquals(String.valueOf(recordNumber), myRecord.get(0));
                 if (recordNumber >= 2) {
                     break;
                 }
             }
             iter.hasNext();
             while (iter.hasNext()) {
-                final CSVRecord record = iter.next();
+                final CSVRecord myRecord = iter.next();
                 recordNumber++;
-                assertEquals(String.valueOf(recordNumber), record.get(0));
+                assertEquals(String.valueOf(recordNumber), myRecord.get(0));
             }
         }
         // Consecutive enhanced for loops shouldn't break sequence
         try (CSVParser parser = CSVFormat.DEFAULT.parse(new StringReader(fiveRows))) {
             int recordNumber = 0;
-            for (final CSVRecord record : parser) {
+            for (final CSVRecord myRecord : parser) {
                 recordNumber++;
-                assertEquals(String.valueOf(recordNumber), record.get(0));
+                assertEquals(String.valueOf(recordNumber), myRecord.get(0));
                 if (recordNumber >= 2) {
                     break;
                 }
             }
-            for (final CSVRecord record : parser) {
+            for (final CSVRecord myRecord : parser) {
                 recordNumber++;
-                assertEquals(String.valueOf(recordNumber), record.get(0));
+                assertEquals(String.valueOf(recordNumber), myRecord.get(0));
             }
         }
         // Consecutive enhanced for loops with hasNext() peeking shouldn't break sequence
         try (CSVParser parser = CSVFormat.DEFAULT.parse(new StringReader(fiveRows))) {
             int recordNumber = 0;
-            for (final CSVRecord record : parser) {
+            for (final CSVRecord myRecord : parser) {
                 recordNumber++;
-                assertEquals(String.valueOf(recordNumber), record.get(0));
+                assertEquals(String.valueOf(recordNumber), myRecord.get(0));
                 if (recordNumber >= 2) {
                     break;
                 }
             }
             parser.iterator().hasNext();
-            for (final CSVRecord record : parser) {
+            for (final CSVRecord myRecord : parser) {
                 recordNumber++;
-                assertEquals(String.valueOf(recordNumber), record.get(0));
+                assertEquals(String.valueOf(recordNumber), myRecord.get(0));
             }
         }
     }
@@ -1157,30 +1154,30 @@ class CSVParserTest {
         final Reader in = new StringReader("a,b,c\n1,2\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("A", "B", "C").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            CSVRecord record;
+            CSVRecord myRecord;
             // 1st record
-            record = records.next();
-            assertTrue(record.isMapped("A"));
-            assertTrue(record.isMapped("B"));
-            assertTrue(record.isMapped("C"));
-            assertTrue(record.isSet("A"));
-            assertTrue(record.isSet("B"));
-            assertFalse(record.isSet("C"));
-            assertEquals("1", record.get("A"));
-            assertEquals("2", record.get("B"));
-            assertFalse(record.isConsistent());
+            myRecord = records.next();
+            assertTrue(myRecord.isMapped("A"));
+            assertTrue(myRecord.isMapped("B"));
+            assertTrue(myRecord.isMapped("C"));
+            assertTrue(myRecord.isSet("A"));
+            assertTrue(myRecord.isSet("B"));
+            assertFalse(myRecord.isSet("C"));
+            assertEquals("1", myRecord.get("A"));
+            assertEquals("2", myRecord.get("B"));
+            assertFalse(myRecord.isConsistent());
             // 2nd record
-            record = records.next();
-            assertTrue(record.isMapped("A"));
-            assertTrue(record.isMapped("B"));
-            assertTrue(record.isMapped("C"));
-            assertTrue(record.isSet("A"));
-            assertTrue(record.isSet("B"));
-            assertTrue(record.isSet("C"));
-            assertEquals("x", record.get("A"));
-            assertEquals("y", record.get("B"));
-            assertEquals("z", record.get("C"));
-            assertTrue(record.isConsistent());
+            myRecord = records.next();
+            assertTrue(myRecord.isMapped("A"));
+            assertTrue(myRecord.isMapped("B"));
+            assertTrue(myRecord.isMapped("C"));
+            assertTrue(myRecord.isSet("A"));
+            assertTrue(myRecord.isSet("B"));
+            assertTrue(myRecord.isSet("C"));
+            assertEquals("x", myRecord.get("A"));
+            assertEquals("y", myRecord.get("B"));
+            assertEquals("z", myRecord.get("C"));
+            assertTrue(myRecord.isConsistent());
             // end
             assertFalse(records.hasNext());
         }
@@ -1469,14 +1466,14 @@ class CSVParserTest {
 
             for (int i = 0; i < 3; i++) {
                 assertTrue(records.hasNext());
-                final CSVRecord record = records.next();
-                assertTrue(record.isMapped("A"));
-                assertTrue(record.isMapped("B"));
-                assertTrue(record.isMapped("C"));
-                assertFalse(record.isMapped("NOT MAPPED"));
-                assertEquals(record.get(0), record.get("A"));
-                assertEquals(record.get(1), record.get("B"));
-                assertEquals(record.get(2), record.get("C"));
+                final CSVRecord myRecord = records.next();
+                assertTrue(myRecord.isMapped("A"));
+                assertTrue(myRecord.isMapped("B"));
+                assertTrue(myRecord.isMapped("C"));
+                assertFalse(myRecord.isMapped("NOT MAPPED"));
+                assertEquals(myRecord.get(0), myRecord.get("A"));
+                assertEquals(myRecord.get(1), myRecord.get("B"));
+                assertEquals(myRecord.get(2), myRecord.get("C"));
             }
 
             assertFalse(records.hasNext());
@@ -1492,14 +1489,14 @@ class CSVParserTest {
 
             for (int i = 0; i < 2; i++) {
                 assertTrue(records.hasNext());
-                final CSVRecord record = records.next();
-                assertTrue(record.isMapped("a"));
-                assertTrue(record.isMapped("b"));
-                assertTrue(record.isMapped("c"));
-                assertFalse(record.isMapped("NOT MAPPED"));
-                assertEquals(record.get(0), record.get("a"));
-                assertEquals(record.get(1), record.get("b"));
-                assertEquals(record.get(2), record.get("c"));
+                final CSVRecord myRecord = records.next();
+                assertTrue(myRecord.isMapped("a"));
+                assertTrue(myRecord.isMapped("b"));
+                assertTrue(myRecord.isMapped("c"));
+                assertFalse(myRecord.isMapped("NOT MAPPED"));
+                assertEquals(myRecord.get(0), myRecord.get("a"));
+                assertEquals(myRecord.get(1), myRecord.get("b"));
+                assertEquals(myRecord.get(2), myRecord.get("c"));
             }
 
             assertFalse(records.hasNext());
@@ -1514,8 +1511,8 @@ class CSVParserTest {
                 .setSkipHeaderRecord(true)
                 .get().builder().setTrim(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            @SuppressWarnings("resource") final CSVParser recordParser = record.getParser();
+            final CSVRecord myRecord = records.next();
+            @SuppressWarnings("resource") final CSVParser recordParser = myRecord.getParser();
             assertEquals(Arrays.asList("header1", "header2", "header1"), recordParser.getHeaderNames());
         }
     }
@@ -1526,8 +1523,8 @@ class CSVParserTest {
         final String data = "a,b,c\r\n1,2,3\r\nx,y,z\r\n";
         try (final CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT);
              final CSVParser parse = CSVParser.parse(data, CSVFormat.DEFAULT)) {
-            for (final CSVRecord record : parse) {
-                printer.printRecord(record);
+            for (final CSVRecord myRecord : parse) {
+                printer.printRecord(myRecord);
             }
             assertEquals(data, out.toString());
         }
@@ -1538,10 +1535,10 @@ class CSVParserTest {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("a"));
-            assertEquals("2", record.get("b"));
-            assertEquals("3", record.get("c"));
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("a"));
+            assertEquals("2", myRecord.get("b"));
+            assertEquals("3", myRecord.get("c"));
         }
     }
 
@@ -1550,10 +1547,10 @@ class CSVParserTest {
         final Reader in = new StringReader("a,a,a\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("X"));
-            assertEquals("2", record.get("Y"));
-            assertEquals("3", record.get("Z"));
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("X"));
+            assertEquals("2", myRecord.get("Y"));
+            assertEquals("3", myRecord.get("Z"));
         }
     }
 
@@ -1562,10 +1559,10 @@ class CSVParserTest {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("X"));
-            assertEquals("2", record.get("Y"));
-            assertEquals("3", record.get("Z"));
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("X"));
+            assertEquals("2", myRecord.get("Y"));
+            assertEquals("3", myRecord.get("Z"));
         }
     }
 
@@ -1574,10 +1571,10 @@ class CSVParserTest {
         final Reader in = new StringReader("a,b,c\n1,2,3\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("a", "b", "c").get().builder().setSkipHeaderRecord(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("a"));
-            assertEquals("2", record.get("b"));
-            assertEquals("3", record.get("c"));
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("a"));
+            assertEquals("2", myRecord.get("b"));
+            assertEquals("3", myRecord.get("c"));
         }
     }
 
@@ -1634,11 +1631,11 @@ class CSVParserTest {
         final Reader in = new StringReader("a,a,a,\n\"1\",\"2\",\"3\",\nx,y,z,");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().builder().setTrailingDelimiter(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("X"));
-            assertEquals("2", record.get("Y"));
-            assertEquals("3", record.get("Z"));
-            assertEquals(3, record.size());
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("X"));
+            assertEquals("2", myRecord.get("Y"));
+            assertEquals("3", myRecord.get("Z"));
+            assertEquals(3, myRecord.size());
         }
     }
 
@@ -1647,11 +1644,11 @@ class CSVParserTest {
         final Reader in = new StringReader("a,a,a\n\" 1 \",\" 2 \",\" 3 \"\nx,y,z");
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader("X", "Y", "Z").get().builder().setSkipHeaderRecord(true).get().builder().setTrim(true).get().parse(in)) {
             final Iterator<CSVRecord> records = parser.iterator();
-            final CSVRecord record = records.next();
-            assertEquals("1", record.get("X"));
-            assertEquals("2", record.get("Y"));
-            assertEquals("3", record.get("Z"));
-            assertEquals(3, record.size());
+            final CSVRecord myRecord = records.next();
+            assertEquals("1", myRecord.get("X"));
+            assertEquals("2", myRecord.get("Y"));
+            assertEquals("3", myRecord.get("Z"));
+            assertEquals(3, myRecord.size());
         }
     }
 
@@ -1673,18 +1670,18 @@ class CSVParserTest {
 
     private void validateRecordNumbers(final String lineSeparator) throws IOException {
         try (final CSVParser parser = CSVParser.parse("a" + lineSeparator + "b" + lineSeparator + "c", CSVFormat.DEFAULT.builder().setRecordSeparator(lineSeparator).get())) {
-            CSVRecord record;
+            CSVRecord myRecord;
             assertEquals(0, parser.getRecordNumber());
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(1, record.getRecordNumber());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(1, myRecord.getRecordNumber());
             assertEquals(1, parser.getRecordNumber());
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(2, record.getRecordNumber());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(2, myRecord.getRecordNumber());
             assertEquals(2, parser.getRecordNumber());
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(3, record.getRecordNumber());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(3, myRecord.getRecordNumber());
             assertEquals(3, parser.getRecordNumber());
-            assertNull(record = parser.nextRecord());
+            assertNull(myRecord = parser.nextRecord());
             assertEquals(3, parser.getRecordNumber());
         }
     }
@@ -1700,32 +1697,32 @@ class CSVParserTest {
         final CSVFormat format = CSVFormat.newFormat(',').builder().setQuote('\'').get().builder().setRecordSeparator(lineSeparator).get();
         final long positionRecord3;
         try (CSVParser parser = CSVParser.parse(code, format)) {
-            CSVRecord record;
+            CSVRecord myRecord;
             assertEquals(0, parser.getRecordNumber());
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(1, record.getRecordNumber());
-            assertEquals(code.indexOf('a'), record.getCharacterPosition());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(1, myRecord.getRecordNumber());
+            assertEquals(code.indexOf('a'), myRecord.getCharacterPosition());
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(2, record.getRecordNumber());
-            assertEquals(code.indexOf('1'), record.getCharacterPosition());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(2, myRecord.getRecordNumber());
+            assertEquals(code.indexOf('1'), myRecord.getCharacterPosition());
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            positionRecord3 = record.getCharacterPosition();
-            assertEquals(3, record.getRecordNumber());
-            assertEquals(code.indexOf("'A"), record.getCharacterPosition());
-            assertEquals("A" + lineSeparator + "A", record.get(0));
-            assertEquals("B" + lineSeparator + "B", record.get(1));
-            assertEquals("CC", record.get(2));
+            assertNotNull(myRecord = parser.nextRecord());
+            positionRecord3 = myRecord.getCharacterPosition();
+            assertEquals(3, myRecord.getRecordNumber());
+            assertEquals(code.indexOf("'A"), myRecord.getCharacterPosition());
+            assertEquals("A" + lineSeparator + "A", myRecord.get(0));
+            assertEquals("B" + lineSeparator + "B", myRecord.get(1));
+            assertEquals("CC", myRecord.get(2));
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(4, record.getRecordNumber());
-            assertEquals(code.indexOf('\u00c4'), record.getCharacterPosition());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(4, myRecord.getRecordNumber());
+            assertEquals(code.indexOf('\u00c4'), myRecord.getCharacterPosition());
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(5, record.getRecordNumber());
-            assertEquals(code.indexOf("EOF"), record.getCharacterPosition());
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(5, myRecord.getRecordNumber());
+            assertEquals(code.indexOf("EOF"), myRecord.getCharacterPosition());
         }
         // now try to read starting at record 3
         try (CSVParser parser = CSVParser.builder()
@@ -1734,34 +1731,34 @@ class CSVParserTest {
                 .setCharacterOffset(positionRecord3)
                 .setRecordNumber(3)
                 .get()) {
-            CSVRecord record;
+            CSVRecord myRecord;
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(3, record.getRecordNumber());
-            assertEquals(code.indexOf("'A"), record.getCharacterPosition());
-            assertEquals("A" + lineSeparator + "A", record.get(0));
-            assertEquals("B" + lineSeparator + "B", record.get(1));
-            assertEquals("CC", record.get(2));
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(3, myRecord.getRecordNumber());
+            assertEquals(code.indexOf("'A"), myRecord.getCharacterPosition());
+            assertEquals("A" + lineSeparator + "A", myRecord.get(0));
+            assertEquals("B" + lineSeparator + "B", myRecord.get(1));
+            assertEquals("CC", myRecord.get(2));
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(4, record.getRecordNumber());
-            assertEquals(code.indexOf('\u00c4'), record.getCharacterPosition());
-            assertEquals("\u00c4", record.get(0));
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(4, myRecord.getRecordNumber());
+            assertEquals(code.indexOf('\u00c4'), myRecord.getCharacterPosition());
+            assertEquals("\u00c4", myRecord.get(0));
         } // again with ctor
         try (CSVParser parser = new CSVParser(new StringReader(code.substring((int) positionRecord3)), format, positionRecord3, 3)) {
-            CSVRecord record;
+            CSVRecord myRecord;
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(3, record.getRecordNumber());
-            assertEquals(code.indexOf("'A"), record.getCharacterPosition());
-            assertEquals("A" + lineSeparator + "A", record.get(0));
-            assertEquals("B" + lineSeparator + "B", record.get(1));
-            assertEquals("CC", record.get(2));
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(3, myRecord.getRecordNumber());
+            assertEquals(code.indexOf("'A"), myRecord.getCharacterPosition());
+            assertEquals("A" + lineSeparator + "A", myRecord.get(0));
+            assertEquals("B" + lineSeparator + "B", myRecord.get(1));
+            assertEquals("CC", myRecord.get(2));
             // nextRecord
-            assertNotNull(record = parser.nextRecord());
-            assertEquals(4, record.getRecordNumber());
-            assertEquals(code.indexOf('\u00c4'), record.getCharacterPosition());
-            assertEquals("\u00c4", record.get(0));
+            assertNotNull(myRecord = parser.nextRecord());
+            assertEquals(4, myRecord.getRecordNumber());
+            assertEquals(code.indexOf('\u00c4'), myRecord.getCharacterPosition());
+            assertEquals("\u00c4", myRecord.get(0));
         }
     }
 }

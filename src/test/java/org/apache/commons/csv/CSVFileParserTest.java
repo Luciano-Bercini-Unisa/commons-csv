@@ -87,13 +87,13 @@ class CSVFileParserTest {
             // Now parse the file and compare against the expected results
             // We use a buffered reader internally so no need to create one here.
             try (final CSVParser parser = CSVParser.parse(new File(BASE_DIR, split[0]), Charset.defaultCharset(), format)) {
-                for (final CSVRecord record : parser) {
-                    String parsed = Arrays.toString(record.values());
-                    final String comment = record.getComment();
+                for (final CSVRecord myRecord : parser) {
+                    String parsed = Arrays.toString(myRecord.values());
+                    final String comment = myRecord.getComment();
                     if (checkComments && comment != null) {
                         parsed += "#" + comment.replace("\n", "\\n");
                     }
-                    final int count = record.size();
+                    final int count = myRecord.size();
                     assertEquals(readTestData(testDataReader), count + ":" + parsed, testFile.getName());
                 }
             }
@@ -132,13 +132,13 @@ class CSVFileParserTest {
             // Now parse the file and compare against the expected results
             final URL resource = ClassLoader.getSystemResource("org/apache/commons/csv/CSVFileParser/" + split[0]);
             try (final CSVParser parser = CSVParser.parse(resource, StandardCharsets.UTF_8, format)) {
-                for (final CSVRecord record : parser) {
-                    String parsed = Arrays.toString(record.values());
-                    final String comment = record.getComment();
+                for (final CSVRecord myRecord : parser) {
+                    String parsed = Arrays.toString(myRecord.values());
+                    final String comment = myRecord.getComment();
                     if (checkComments && comment != null) {
                         parsed += "#" + comment.replace("\n", "\\n");
                     }
-                    final int count = record.size();
+                    final int count = myRecord.size();
                     assertEquals(readTestData(testData), count + ":" + parsed, testFile.getName());
                 }
             }

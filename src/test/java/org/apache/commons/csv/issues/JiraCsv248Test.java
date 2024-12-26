@@ -48,11 +48,6 @@ import org.junit.jupiter.api.Test;
      */
     @Test
      void testJiraCsv248() throws IOException, ClassNotFoundException {
-        // Record was originally created using CSV version 1.6 with the following code:
-        // try (final CSVParser parser = CSVParser.parse("A,B\n#my comment\nOne,Two",
-        // CSVFormat.DEFAULT.builder().setHeader().setCommentMarker('#'))) {
-        // CSVRecord rec = parser.iterator().next();
-        // }
         try (InputStream in = getTestInput(); final ObjectInputStream ois = new ObjectInputStream(in)) {
             final Object object = ois.readObject();
             assertInstanceOf(CSVRecord.class, object);

@@ -112,21 +112,18 @@ class CSVPrinterTest {
 
         final int nLines = r.nextInt(4) + 1;
         final int nCol = r.nextInt(3) + 1;
-        // nLines=1;nCol=2;
         final String[][] lines = generateLines(nLines, nCol);
 
         final StringWriter sw = new StringWriter();
         try (final CSVPrinter printer = new CSVPrinter(sw, format)) {
 
             for (int i = 0; i < nLines; i++) {
-                // for (int j=0; j<lines[i].length; j++) System.out.println("### VALUE=:" + printable(lines[i][j]));
                 printer.printRecord((Object[]) lines[i]);
             }
 
             printer.flush();
         }
         final String result = sw.toString();
-        // System.out.println("### :" + printable(result));
 
         try (final CSVParser parser = CSVParser.parse(result, format)) {
             final List<CSVRecord> parseResult = parser.getRecords();
@@ -195,7 +192,6 @@ class CSVPrinterTest {
     private String randStr() {
         final Random r = new Random();
         final int sz = r.nextInt(20);
-        // sz = r.nextInt(3);
         final char[] buf = new char[sz];
         for (int i = 0; i < sz; i++) {
             // stick in special chars with greater frequency
@@ -232,7 +228,6 @@ class CSVPrinterTest {
                 default:
                     ch = (char) r.nextInt(300);
                     break;
-                // default: ch = 'a'; break;
             }
             buf[i] = ch;
         }
@@ -277,7 +272,6 @@ class CSVPrinterTest {
 
     @Test
     void testCloseWithCsvFormatAutoFlushOn() throws IOException {
-        // System.out.println("start method");
         try (final Writer writer = mock(Writer.class)) {
             final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setAutoFlush(true).get();
             try (CSVPrinter printer = new CSVPrinter(writer, csvFormat)) {

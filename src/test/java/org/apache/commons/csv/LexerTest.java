@@ -344,7 +344,6 @@ import org.junit.jupiter.api.Test;
             assertThat(parser.nextToken(new Token()), matches(EORECORD, "b"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, "a"));
             assertThat(parser.nextToken(new Token()), matches(TOKEN, " foo "));
-            // assertTokenEquals(EORECORD, "b", parser.nextToken(new Token()));
             assertThat(parser.nextToken(new Token()), matches(EOF, "b"));
         }
     }
@@ -365,9 +364,6 @@ import org.junit.jupiter.api.Test;
     // change delimiters, comment, encapsulater
     @Test
      void testNextToken6() throws IOException {
-        /*
-         * file: a;'b and \' more ' !comment;;;; ;;
-         */
         final String code = "a;'b and '' more\n'\n!comment;;;;\n;;";
         final CSVFormat format = CSVFormat.DEFAULT.builder().setQuote('\'').get().builder().setCommentMarker('!').get().builder().setDelimiter(';').get();
         try (final Lexer parser = createLexer(code, format)) {

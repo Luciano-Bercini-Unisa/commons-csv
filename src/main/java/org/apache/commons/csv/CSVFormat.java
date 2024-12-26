@@ -1648,19 +1648,11 @@ public final class CSVFormat implements Serializable {
     }
 
     private void append(final char c, final Appendable appendable) throws IOException {
-        //try {
         appendable.append(c);
-        //} catch (final IOException e) {
-        //    throw new UncheckedIOException(e);
-        //}
     }
 
     private void append(final CharSequence csq, final Appendable appendable) throws IOException {
-        //try {
         appendable.append(csq);
-        //} catch (final IOException e) {
-        //    throw new UncheckedIOException(e);
-        //}
     }
 
     /**
