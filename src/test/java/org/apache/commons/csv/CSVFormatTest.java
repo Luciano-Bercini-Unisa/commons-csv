@@ -605,10 +605,10 @@ class CSVFormatTest {
     @Test
     void testGetAllowDuplicateHeaderNames() {
         final Builder builder = CSVFormat.DEFAULT.builder();
-        assertSame(builder.get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
-        assertSame(builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
-        assertNotSame(builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
-        assertNotSame(builder.setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW).get().getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
+        assertSame(DuplicateHeaderMode.ALLOW_ALL, builder.get().getDuplicateHeaderMode());
+        assertSame(DuplicateHeaderMode.ALLOW_ALL, builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL).get().getDuplicateHeaderMode());
+        assertNotSame(DuplicateHeaderMode.ALLOW_ALL, builder.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get().getDuplicateHeaderMode());
+        assertNotSame(DuplicateHeaderMode.ALLOW_ALL, builder.setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW).get().getDuplicateHeaderMode());
     }
 
     @Test
@@ -1088,7 +1088,7 @@ class CSVFormatTest {
         final CSVFormat formatWithEmptyDuplicates = CSVFormat.DEFAULT.builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get();
 
         assertEquals(DuplicateHeaderMode.ALLOW_EMPTY, formatWithEmptyDuplicates.getDuplicateHeaderMode());
-        assertNotSame(formatWithEmptyDuplicates.getDuplicateHeaderMode(), DuplicateHeaderMode.ALLOW_ALL);
+        assertNotSame(DuplicateHeaderMode.ALLOW_ALL, formatWithEmptyDuplicates.getDuplicateHeaderMode());
     }
 
     @Test
