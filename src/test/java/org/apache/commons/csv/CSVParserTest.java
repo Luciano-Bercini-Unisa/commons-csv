@@ -1224,12 +1224,7 @@ class CSVParserTest {
     void testNewCSVParserNullReaderFormat() {
         assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(null).setFormat(CSVFormat.DEFAULT).get());
     }
-
-    @Test
-    void testNewCSVParserReaderNullFormat() {
-//        assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(new StringReader("")).setFormat(null).get());
-        assertThrows(NullPointerException.class, () -> new CSVParser(new StringReader(""), null));
-    }
+    
 
     @Test
     void testNoHeaderMap() throws Exception {

@@ -44,7 +44,7 @@ class JiraCsv198Test {
         assertNotNull(pointsOfReference);
         try (@SuppressWarnings("resource")
         CSVParser parser = CSV_FORMAT.parse(new InputStreamReader(pointsOfReference, StandardCharsets.UTF_8))) {
-            parser.forEach(record -> assertNotNull(record.get("location_type")));
+            parser.forEach(myRecord -> assertNotNull(myRecord.get("location_type")));
         }
     }
 

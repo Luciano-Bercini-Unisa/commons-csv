@@ -40,11 +40,11 @@ import org.junit.jupiter.api.Test;
 
         final CSVFormat parseFormat = CSVFormat.DEFAULT.builder().setDelimiter('\t').setHeader().setSkipHeaderRecord(true).get();
         try (final CSVParser parser = parseFormat.parse(new StringReader(formatted))) {
-            parser.forEach(record -> {
-                assertEquals("1", record.get(0));
-                assertEquals("Jane Doe", record.get(1));
-                assertEquals("USA", record.get(2));
-                assertEquals("", record.get(3));
+            parser.forEach(myRecord -> {
+                assertEquals("1", myRecord.get(0));
+                assertEquals("Jane Doe", myRecord.get(1));
+                assertEquals("USA", myRecord.get(2));
+                assertEquals("", myRecord.get(3));
             });
         }
     }

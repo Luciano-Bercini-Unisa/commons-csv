@@ -105,7 +105,6 @@ import org.junit.jupiter.api.Test;
         final StringBuilder buffer = new StringBuilder();
         try (final CSVPrinter printer = new CSVPrinter(buffer, format)) {
             printer.printRecord("", "Hello", "", "World");
-            // printer.printRecord(new Object[] { null, "Hello", null, "World" });
         }
         assertEquals("\"\",\"Hello\",\"\",\"World\"\r\n", buffer.toString());
     }

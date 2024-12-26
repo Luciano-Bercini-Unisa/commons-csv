@@ -236,8 +236,7 @@ final class Lexer implements Closeable {
                 c = reader.read();
                 eol = readEndOfLine(c);
                 // reached the end of the file without any content (empty line at the end)
-                if (isEndOfFile(c)) {
-                    token.type = Token.Type.EOF;
+                if (isCharEndOfFile(token, c)) {
                     // don't set token.isReady here because no content
                     return token;
                 }
@@ -252,6 +251,11 @@ final class Lexer implements Closeable {
         if (isStartOfLineComment(token, lastChar, c)) {
             return token;
         }
+        handleInvalidToken(token, eol, c);
+        return token;
+    }
+    
+    private void handleInvalidToken(Token token, boolean eol, int c) throws IOException {
         // Important: make sure a new char gets consumed in each iteration
         while (token.type == Token.Type.INVALID) {
             // ignore whitespaces at beginning of a token
@@ -263,7 +267,14 @@ final class Lexer implements Closeable {
             }
             processTokenType(token, c, eol);
         }
-        return token;
+    }
+    
+    private boolean isCharEndOfFile(Token token, int c) {
+        if (isEndOfFile(c)) {
+            token.type = Token.Type.EOF;
+            return true;
+        }
+        return false;
     }
     
     private boolean isStartOfLineComment(Token token, int lastChar, int c) throws IOException {
@@ -341,42 +352,53 @@ final class Lexer implements Closeable {
         int c;
         while (true) {
             c = reader.read();
-            if (isQuoteChar(c)) {
-                if (isQuoteChar(reader.peek())) {
-                    // double or escaped encapsulator -> add single encapsulator to token
-                    c = reader.read();
-                    token.content.append((char) c);
-                } else {
-                    // token finish mark (encapsulator) reached: ignore whitespace till delimiter
-                    while (true) {
-                        c = reader.read();
-                        if (handleDelimiters(token, c)) {
-                            return token;
-                        }
-                        if (trailingData) {
-                            token.content.append((char) c);
-                        } else if (!Character.isWhitespace((char) c)) {
-                            // error invalid char between token and next delimiter
-                            throw new CSVException("Invalid character between encapsulated token and delimiter at line: %,d, position: %,d",
-                                    getCurrentLineNumber(), getCharacterPosition());
-                        }
-                    }
-                }
-            } else if (isEscape(c)) {
-                appendNextEscapedCharacterToToken(token);
-            } else if (isEndOfFile(c)) {
-                if (lenientEof) {
-                    token.type = Token.Type.EOF;
-                    token.isReady = true; // There is data at EOF
-                    return token;
-                }
-                // error condition (end of file before end of token)
-                throw new CSVException("(startline %,d) EOF reached before encapsulated token finished", startLineNumber);
-            } else {
-                // consume character
-                token.content.append((char) c);
+            if (handleCharacterInEncapsulatedToken(token, c, startLineNumber)) {
+                return token;
             }
         }
+    }
+    
+    private boolean handleCharacterInEncapsulatedToken(Token token, int c, long startLineNumber) throws IOException {
+        if (isQuoteChar(c)) {
+            if (isQuoteChar(reader.peek())) {
+                // double or escaped encapsulator -> add single encapsulator to token
+                c = reader.read();
+                token.content.append((char) c);
+            } else {
+                // token finish mark (encapsulator) reached: ignore whitespace till delimiter
+                while (true) {
+                    c = reader.read();
+                    if (handleDelimiters(token, c)) {
+                        return true;
+                    }
+                    if (trailingData) {
+                        token.content.append((char) c);
+                    } else if (!Character.isWhitespace((char) c)) {
+                        // error invalid char between token and next delimiter
+                        throw new CSVException("Invalid character between encapsulated token and delimiter at line: %,d, position: %,d",
+                                getCurrentLineNumber(), getCharacterPosition());
+                    }
+                }
+            }
+        } else if (isEscape(c)) {
+            appendNextEscapedCharacterToToken(token);
+        } else if (isEndOfFile(c)) {
+            return handleLenientEof(token, startLineNumber);
+        } else {
+            // consume character
+            token.content.append((char) c);
+        }
+        return false;
+    }
+    
+    private boolean handleLenientEof(Token token, long startLineNumber) throws CSVException {
+        if (lenientEof) {
+            token.type = Token.Type.EOF;
+            token.isReady = true; // There is data at EOF
+            return true;
+        }
+        // error condition (end of file before end of token)
+        throw new CSVException("(startline %,d) EOF reached before encapsulated token finished", startLineNumber);
     }
     
     private boolean handleDelimiters(Token token, int c) throws IOException {

@@ -105,9 +105,9 @@ import org.apache.commons.io.IOUtils;
     private static Stats iterate(final Iterable<CSVRecord> iterable) {
         int count = 0;
         int fields = 0;
-        for (final CSVRecord record : iterable) {
+        for (final CSVRecord myRecord : iterable) {
             count++;
-            fields += record.size();
+            fields += myRecord.size();
         }
         return new Stats(count, fields);
     }
@@ -184,10 +184,10 @@ import org.apache.commons.io.IOUtils;
     private static Stats readAll(final BufferedReader in, final boolean split) throws IOException {
         int count = 0;
         int fields = 0;
-        String record;
-        while ((record = in.readLine()) != null) {
+        String myRecord;
+        while ((myRecord = in.readLine()) != null) {
             count++;
-            fields += split ? record.split(",").length : 1;
+            fields += split ? myRecord.split(",").length : 1;
         }
         return new Stats(count, fields);
     }

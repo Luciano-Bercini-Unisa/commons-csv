@@ -59,7 +59,7 @@ import org.junit.jupiter.api.Test;
  class JiraCsv290Test {
 
     private void testHelper(final String fileName, final CSVFormat format) throws Exception {
-        List<List<String>> content = new ArrayList<>();
+        List<List<String>> content;
         try (CSVParser csvParser = CSVParser.parse(new InputStreamReader(this.getClass().getResourceAsStream("/org/apache/commons/csv/CSV-290/" + fileName)),
                 format)) {
             content = csvParser.stream().collect(Collectors.mapping(CSVRecord::toList, Collectors.toList()));

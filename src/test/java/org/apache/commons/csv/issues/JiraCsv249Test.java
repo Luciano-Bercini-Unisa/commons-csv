@@ -32,7 +32,9 @@ import org.junit.jupiter.api.Test;
 
  class JiraCsv249Test {
 
-    @Test
+     private CSVParser parser;
+
+     @Test
      void testJiraCsv249() throws IOException {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setEscape('\\').get();
         final StringWriter stringWriter = new StringWriter();
@@ -44,9 +46,9 @@ import org.junit.jupiter.api.Test;
         try (CSVParser parser = CSVParser.builder().setReader(reader).setFormat(format).get()) {
             records = parser.getRecords();
         }
-        records.forEach(record -> {
-            assertEquals("foo \\", record.get(0));
-            assertEquals("bar", record.get(1));
+        records.forEach(myRecord -> {
+            assertEquals("foo \\", myRecord.get(0));
+            assertEquals("bar", myRecord.get(1));
         });
 
     }
