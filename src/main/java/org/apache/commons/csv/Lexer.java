@@ -22,6 +22,8 @@ import static org.apache.commons.io.IOUtils.EOF;
 import java.io.Closeable;
 import java.io.IOException;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import javafx.util.Pair;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -365,20 +367,7 @@ final class Lexer implements Closeable {
                 c = reader.read();
                 token.content.append((char) c);
             } else {
-                // token finish mark (encapsulator) reached: ignore whitespace till delimiter
-                while (true) {
-                    c = reader.read();
-                    if (handleDelimiters(token, c)) {
-                        return true;
-                    }
-                    if (trailingData) {
-                        token.content.append((char) c);
-                    } else if (!Character.isWhitespace((char) c)) {
-                        // error invalid char between token and next delimiter
-                        throw new CSVException("Invalid character between encapsulated token and delimiter at line: %,d, position: %,d",
-                                getCurrentLineNumber(), getCharacterPosition());
-                    }
-                }
+                return ignoreWhitespaceTillDelimiter(token);
             }
         } else if (isEscape(c)) {
             appendNextEscapedCharacterToToken(token);
@@ -389,6 +378,23 @@ final class Lexer implements Closeable {
             token.content.append((char) c);
         }
         return false;
+    }
+    
+    private boolean ignoreWhitespaceTillDelimiter(Token token) throws IOException {
+        // token finish mark (encapsulator) reached: ignore whitespace till delimiter
+        while (true) {
+            int c = reader.read();
+            if (handleDelimiters(token, c)) {
+                return true;
+            }
+            if (trailingData) {
+                token.content.append((char) c);
+            } else if (!Character.isWhitespace((char) c)) {
+                // error invalid char between token and next delimiter
+                throw new CSVException("Invalid character between encapsulated token and delimiter at line: %,d, position: %,d",
+                        getCurrentLineNumber(), getCharacterPosition());
+            }
+        }
     }
     
     private boolean handleLenientEof(Token token, long startLineNumber) throws CSVException {
