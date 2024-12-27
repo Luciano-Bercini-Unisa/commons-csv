@@ -501,8 +501,6 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
             // Make header names Collection immutable
             return new Headers(null, Collections.emptyList());
         }
-        Map<String, Integer> hdrMap = createEmptyHeaderMap();
-        List<String> headerNames = null;
         String[] headerRecord = null;
         if (formatHeader.length == 0) {
             // read the header from the first line of the file
@@ -521,6 +519,13 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
             headerRecord = formatHeader;
         }
         // build the name to index mappings
+        Map<String, Integer> hdrMap = createEmptyHeaderMap();
+        List<String> headerNames = buildNameToIndexMappings(headerRecord, hdrMap);
+        return new Headers(hdrMap, headerNames == null ? Collections.emptyList() : Collections.unmodifiableList(headerNames));
+    }
+
+    private List<String> buildNameToIndexMappings(String[] headerRecord, Map<String, Integer> hdrMap) {
+        List<String> headerNames = null;
         if (headerRecord != null) {
             // Track an occurrence of a null, empty or blank header.
             boolean observedMissing = false;
@@ -551,7 +556,7 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
                 }
             }
         }
-        return new Headers(hdrMap, headerNames == null ? Collections.emptyList() : Collections.unmodifiableList(headerNames));
+        return headerNames;
     }
 
     /**
