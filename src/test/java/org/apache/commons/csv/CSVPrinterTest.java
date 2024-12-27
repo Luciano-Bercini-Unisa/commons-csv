@@ -66,6 +66,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests {@link CSVPrinter}.
@@ -856,7 +859,7 @@ class CSVPrinterTest {
             }
         }
     }
-
+    
     @Test
     void testJira135_part1() throws IOException {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setRecordSeparator('\n').get().builder().setQuote(DQUOTE_CHAR).get().builder().setEscape(BACKSLASH).get();
@@ -871,25 +874,10 @@ class CSVPrinterTest {
         final String[] record0 = toFirstRecordValues(expected, format);
         assertArrayEquals(expectNulls(list.toArray(), format), record0);
     }
-
+    
+    
     @Test
-    @Disabled
     void testJira135_part2() throws IOException {
-        final CSVFormat format = CSVFormat.DEFAULT.builder().setRecordSeparator('\n').get().builder().setQuote(DQUOTE_CHAR).get().builder().setEscape(BACKSLASH).get();
-        final StringWriter sw = new StringWriter();
-        final List<String> list = new LinkedList<>();
-        try (final CSVPrinter printer = new CSVPrinter(sw, format)) {
-            list.add("\n");
-            printer.printRecord(list);
-        }
-        final String expected = "\"\\n\"" + format.getRecordSeparator();
-        assertEquals(expected, sw.toString());
-        final String[] record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(list.toArray(), format), record0);
-    }
-
-    @Test
-    void testJira135_part3() throws IOException {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setRecordSeparator('\n').get().builder().setQuote(DQUOTE_CHAR).get().builder().setEscape(BACKSLASH).get();
         final StringWriter sw = new StringWriter();
         final List<String> list = new LinkedList<>();
