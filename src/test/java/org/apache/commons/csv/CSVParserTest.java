@@ -78,24 +78,24 @@ class CSVParserTest {
     private static final String[][] RESULT = {{"a", "b", "c", "d"}, {"a", "b", "1 2"}, {"foo baar", "b", ""}, {"foo\n,,\n\",,\n\"", "d", "e"}};
 
     // CSV with no header comments
-    static private final String CSV_INPUT_NO_COMMENT = "A,B" + CRLF + "1,2" + CRLF;
+    private static final String CSV_INPUT_NO_COMMENT = "A,B" + CRLF + "1,2" + CRLF;
 
     // CSV with a header comment
-    static private final String CSV_INPUT_HEADER_COMMENT = "# header comment" + CRLF + "A,B" + CRLF + "1,2" + CRLF;
+    private static final String CSV_INPUT_HEADER_COMMENT = "# header comment" + CRLF + "A,B" + CRLF + "1,2" + CRLF;
 
     // CSV with a single line header and trailer comment
-    static private final String CSV_INPUT_HEADER_TRAILER_COMMENT = "# header comment" + CRLF + "A,B" + CRLF + "1,2" + CRLF + "# comment";
+    private static final String CSV_INPUT_HEADER_TRAILER_COMMENT = "# header comment" + CRLF + "A,B" + CRLF + "1,2" + CRLF + "# comment";
 
     // CSV with a multi-line header and trailer comment
-    static private final String CSV_INPUT_MULTILINE_HEADER_TRAILER_COMMENT = "# multi-line" + CRLF + "# header comment" + CRLF + "A,B" + CRLF + "1,2" + CRLF +
+    private static final String CSV_INPUT_MULTILINE_HEADER_TRAILER_COMMENT = "# multi-line" + CRLF + "# header comment" + CRLF + "A,B" + CRLF + "1,2" + CRLF +
             "# multi-line" + CRLF + "# comment";
 
     // Format with auto-detected header
-    static private final CSVFormat FORMAT_AUTO_HEADER = CSVFormat.Builder.create(CSVFormat.DEFAULT).setCommentMarker('#').setHeader().get();
+    private static final CSVFormat FORMAT_AUTO_HEADER = CSVFormat.Builder.create(CSVFormat.DEFAULT).setCommentMarker('#').setHeader().get();
 
     // Format with explicit header
     // @formatter:off
-    static private final CSVFormat FORMAT_EXPLICIT_HEADER = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+    private static final CSVFormat FORMAT_EXPLICIT_HEADER = CSVFormat.Builder.create(CSVFormat.DEFAULT)
             .setSkipHeaderRecord(true)
             .setCommentMarker('#')
             .setHeader("A", "B")
@@ -104,7 +104,7 @@ class CSVParserTest {
 
     // Format with explicit header that does not skip the header line
     // @formatter:off
-    CSVFormat FORMAT_EXPLICIT_HEADER_NOSKIP = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+    CSVFormat FORMAT_EXPLICIT_HEADER_NO_SKIP = CSVFormat.Builder.create(CSVFormat.DEFAULT)
             .setCommentMarker('#')
             .setHeader("A", "B")
             .get();
@@ -414,7 +414,7 @@ class CSVParserTest {
         final String[][] res = {{"a", "b#"}, {"\n", " ", "#"}, {"#", ""}, {"# Final comment"}};
         CSVFormat format = CSVFormat.DEFAULT;
         assertFalse(format.isCommentMarkerSet());
-        final String[][] res_comments = {{"a", "b#"}, {"\n", " ", "#"}};
+        final String[][] resComments = {{"a", "b#"}, {"\n", " ", "#"}};
         try (final CSVParser parser = CSVParser.parse(code, format)) {
             final List<CSVRecord> records = parser.getRecords();
             assertFalse(records.isEmpty());
@@ -423,7 +423,7 @@ class CSVParserTest {
         }
         try (final CSVParser parser = CSVParser.parse(code, format)) {
             final List<CSVRecord> records = parser.getRecords();
-            Utils.compare("Failed to parse with comments", res_comments, records);
+            Utils.compare("Failed to parse with comments", resComments, records);
         }
     }
 
@@ -661,7 +661,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderComment_HeaderComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
             parser.getRecords();
             // Expect no header comment - the text "comment" is attached to the first record
             assertFalse(parser.hasHeaderComment());
@@ -701,7 +701,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderComment_NoComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
             parser.getRecords();
             // Expect no header comment
             assertFalse(parser.hasHeaderComment());
@@ -904,7 +904,7 @@ class CSVParserTest {
 
     @Test
     void testGetTrailerComment_HeaderComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
             parser.getRecords();
             assertFalse(parser.hasTrailerComment());
             assertNull(parser.getTrailerComment());
@@ -931,7 +931,7 @@ class CSVParserTest {
 
     @Test
     void testGetTrailerComment_HeaderTrailerComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, FORMAT_EXPLICIT_HEADER_NOSKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
             parser.getRecords();
             assertTrue(parser.hasTrailerComment());
             assertEquals("comment", parser.getTrailerComment());

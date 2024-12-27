@@ -68,14 +68,14 @@ class CSVFileParserTest {
             boolean checkComments = false;
             for (int i = 1; i < split.length; i++) {
                 final String option = split[i];
-                final String[] option_parts = option.split("=", 2);
-                if ("IgnoreEmpty".equalsIgnoreCase(option_parts[0])) {
-                    format = format.builder().setIgnoreEmptyLines(Boolean.parseBoolean(option_parts[1])).get();
-                } else if ("IgnoreSpaces".equalsIgnoreCase(option_parts[0])) {
-                    format = format.builder().setIgnoreSurroundingSpaces(Boolean.parseBoolean(option_parts[1])).get();
-                } else if ("CommentStart".equalsIgnoreCase(option_parts[0])) {
-                    format = format.builder().setCommentMarker(option_parts[1].charAt(0)).get();
-                } else if ("CheckComments".equalsIgnoreCase(option_parts[0])) {
+                final String[] optionParts = option.split("=", 2);
+                if ("IgnoreEmpty".equalsIgnoreCase(optionParts[0])) {
+                    format = format.builder().setIgnoreEmptyLines(Boolean.parseBoolean(optionParts[1])).get();
+                } else if ("IgnoreSpaces".equalsIgnoreCase(optionParts[0])) {
+                    format = format.builder().setIgnoreSurroundingSpaces(Boolean.parseBoolean(optionParts[1])).get();
+                } else if ("CommentStart".equalsIgnoreCase(optionParts[0])) {
+                    format = format.builder().setCommentMarker(optionParts[1].charAt(0)).get();
+                } else if ("CheckComments".equalsIgnoreCase(optionParts[0])) {
                     checkComments = true;
                 } else {
                     fail(testFile.getName() + " unexpected option: " + option);
@@ -113,14 +113,14 @@ class CSVFileParserTest {
             boolean checkComments = false;
             for (int i = 1; i < split.length; i++) {
                 final String option = split[i];
-                final String[] option_parts = option.split("=", 2);
-                if ("IgnoreEmpty".equalsIgnoreCase(option_parts[0])) {
-                    format = format.builder().setIgnoreEmptyLines(Boolean.parseBoolean(option_parts[1])).get();
-                } else if ("IgnoreSpaces".equalsIgnoreCase(option_parts[0])) {
-                    format = format.builder().setIgnoreSurroundingSpaces(Boolean.parseBoolean(option_parts[1])).get();
-                } else if ("CommentStart".equalsIgnoreCase(option_parts[0])) {
-                    format = format.builder().setCommentMarker(option_parts[1].charAt(0)).get();
-                } else if ("CheckComments".equalsIgnoreCase(option_parts[0])) {
+                final String[] optionParts = option.split("=", 2);
+                if ("IgnoreEmpty".equalsIgnoreCase(optionParts[0])) {
+                    format = format.builder().setIgnoreEmptyLines(Boolean.parseBoolean(optionParts[1])).get();
+                } else if ("IgnoreSpaces".equalsIgnoreCase(optionParts[0])) {
+                    format = format.builder().setIgnoreSurroundingSpaces(Boolean.parseBoolean(optionParts[1])).get();
+                } else if ("CommentStart".equalsIgnoreCase(optionParts[0])) {
+                    format = format.builder().setCommentMarker(optionParts[1].charAt(0)).get();
+                } else if ("CheckComments".equalsIgnoreCase(optionParts[0])) {
                     checkComments = true;
                 } else {
                     fail(testFile.getName() + " unexpected option: " + option);

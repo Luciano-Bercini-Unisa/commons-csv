@@ -302,14 +302,12 @@ final class Lexer implements Closeable {
             token.type = Token.Type.TOKEN;
         } else if (eol) {
             // empty token return EORECORD("")
-            // noop: token.content.append("");
             token.type = Token.Type.EORECORD;
         } else if (isQuoteChar(c)) {
             // consume encapsulated token
             parseEncapsulatedToken(token);
         } else if (isEndOfFile(c)) {
             // end of file return EOF()
-            // noop: token.content.append("");
             token.type = Token.Type.EOF;
             token.isReady = true; // there is data at EOF
         } else {
