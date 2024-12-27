@@ -36,17 +36,17 @@ import org.junit.jupiter.api.Test;
         final String source = "FirstName[|]LastName[|]Address\r\nJohn[|]Smith[|]123 Main St.";
         final StringReader reader = new StringReader(source);
         final CSVFormat format = CSVFormat.DEFAULT.builder().setDelimiter("[|]").get();
-        CSVRecord record = null;
+        CSVRecord myRecord;
         try (final CSVParser csvParser = CSVParser.builder().setReader(reader).setFormat(format).get()) {
             final Iterator<CSVRecord> iterator = csvParser.iterator();
-            record = iterator.next();
-            assertEquals("FirstName", record.get(0));
-            assertEquals("LastName", record.get(1));
-            assertEquals("Address", record.get(2));
-            record = iterator.next();
-            assertEquals("John", record.get(0));
-            assertEquals("Smith", record.get(1));
-            assertEquals("123 Main St.", record.get(2));
+            myRecord = iterator.next();
+            assertEquals("FirstName", myRecord.get(0));
+            assertEquals("LastName", myRecord.get(1));
+            assertEquals("Address", myRecord.get(2));
+            myRecord = iterator.next();
+            assertEquals("John", myRecord.get(0));
+            assertEquals("Smith", myRecord.get(1));
+            assertEquals("123 Main St.", myRecord.get(2));
         }
         // Write with multiple character delimiter
         // @formatter:off
@@ -64,9 +64,9 @@ import org.junit.jupiter.api.Test;
         // @formatter:on
         final StringBuilder out = new StringBuilder();
         try (final CSVPrinter printer = formatExcel.print(out)) {
-            printer.print(record.get(0));
-            printer.print(record.get(1));
-            printer.print(record.get(2));
+            printer.print(myRecord.get(0));
+            printer.print(myRecord.get(1));
+            printer.print(myRecord.get(2));
         }
         final String s = out.toString();
         assertEquals(outString, s);

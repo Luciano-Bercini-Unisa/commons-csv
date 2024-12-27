@@ -101,14 +101,22 @@ import org.junit.jupiter.api.Test;
     }
 
     @Test
-     void testReadLine() throws Exception {
+     void testReadLine1() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("")) {
             assertNull(br.readLine());
         }
+    }
+
+    @Test
+    void testReadLine2() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("\n")) {
             assertEquals("", br.readLine());
             assertNull(br.readLine());
         }
+    }
+
+    @Test
+    void testReadLine3() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("foo\n\nhello")) {
             assertEquals(0, br.getLineNumber());
             assertEquals("foo", br.readLine());
@@ -120,6 +128,10 @@ import org.junit.jupiter.api.Test;
             assertNull(br.readLine());
             assertEquals(3, br.getLineNumber());
         }
+    }
+
+    @Test
+    void testReadLine4() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("foo\n\nhello")) {
             assertEquals('f', br.read());
             assertEquals('o', br.peek());
@@ -133,6 +145,10 @@ import org.junit.jupiter.api.Test;
             assertNull(br.readLine());
             assertEquals(3, br.getLineNumber());
         }
+    }
+
+    @Test
+    void testReadLine5() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("foo\rbaar\r\nfoo")) {
             assertEquals("foo", br.readLine());
             assertEquals('b', br.peek());
@@ -142,9 +158,9 @@ import org.junit.jupiter.api.Test;
             assertNull(br.readLine());
         }
     }
-
+    
     @Test
-     void testReadLookahead1() throws Exception {
+    void testReadLookahead1() throws Exception {
         try (final ExtendedBufferedReader br = createBufferedReader("1\n2\r3\n")) {
             assertEquals(0, br.getLineNumber());
             assertEquals('1', br.peek());
@@ -152,7 +168,14 @@ import org.junit.jupiter.api.Test;
             assertEquals(0, br.getLineNumber());
             assertEquals('1', br.read()); // Start line 1
             assertEquals('1', br.getLastChar());
+        }
+    }
 
+    @Test
+     void testReadLookahead2() throws Exception {
+        try (final ExtendedBufferedReader br = createBufferedReader("1\n2\r3\n")) {
+            assertEquals('1', br.read()); // Start line 1
+            assertEquals('1', br.getLastChar());
             assertEquals(1, br.getLineNumber());
             assertEquals('\n', br.peek());
             assertEquals(1, br.getLineNumber());
@@ -161,28 +184,37 @@ import org.junit.jupiter.api.Test;
             assertEquals(1, br.getLineNumber());
             assertEquals('\n', br.getLastChar());
             assertEquals(1, br.getLineNumber());
-
             assertEquals('2', br.peek());
             assertEquals(1, br.getLineNumber());
             assertEquals('\n', br.getLastChar());
             assertEquals(1, br.getLineNumber());
             assertEquals('2', br.read()); // Start line 2
-            assertEquals(2, br.getLineNumber());
             assertEquals('2', br.getLastChar());
-
+            assertEquals(2, br.getLineNumber());
             assertEquals('\r', br.peek());
             assertEquals(2, br.getLineNumber());
             assertEquals('2', br.getLastChar());
             assertEquals('\r', br.read());
             assertEquals('\r', br.getLastChar());
             assertEquals(2, br.getLineNumber());
-
             assertEquals('3', br.peek());
             assertEquals('\r', br.getLastChar());
             assertEquals('3', br.read()); // Start line 3
             assertEquals('3', br.getLastChar());
             assertEquals(3, br.getLineNumber());
+        }
+    }
 
+    @Test
+    void testReadLookahead3() throws Exception {
+        try (final ExtendedBufferedReader br = createBufferedReader("1\n2\r3\n")) {
+            assertEquals('1', br.read()); // Start line 1
+            assertEquals('\n', br.read());
+            assertEquals('2', br.read()); // Start line 2
+            assertEquals('\r', br.read());
+            assertEquals('3', br.read()); // Start line 3
+            assertEquals('3', br.getLastChar());
+            assertEquals(3, br.getLineNumber());
             assertEquals('\n', br.peek());
             assertEquals(3, br.getLineNumber());
             assertEquals('3', br.getLastChar());
@@ -190,7 +222,6 @@ import org.junit.jupiter.api.Test;
             assertEquals(3, br.getLineNumber());
             assertEquals('\n', br.getLastChar());
             assertEquals(3, br.getLineNumber());
-
             assertEquals(EOF, br.peek());
             assertEquals('\n', br.getLastChar());
             assertEquals(EOF, br.read());
@@ -198,12 +229,11 @@ import org.junit.jupiter.api.Test;
             assertEquals(EOF, br.read());
             assertEquals(EOF, br.peek());
             assertEquals(3, br.getLineNumber());
-
         }
     }
 
     @Test
-     void testReadLookahead2() throws Exception {
+     void testReadLookahead4() throws Exception {
         final char[] ref = new char[5];
         final char[] res = new char[5];
 

@@ -49,10 +49,10 @@ import org.junit.jupiter.api.Test;
                 .setFormat(format).get()) {
             final List<CSVRecord> records = parser.getRecords();
             assertEquals(1, records.size());
-            final CSVRecord record = records.get(0);
-            assertEquals("a", record.get(0));
-            assertEquals("b \"\"", record.get(1));
-            assertEquals("c", record.get(2));
+            final CSVRecord myRecord = records.get(0);
+            assertEquals("a", myRecord.get(0));
+            assertEquals("b \"\"", myRecord.get(1));
+            assertEquals("c", myRecord.get(2));
         }
     }
 

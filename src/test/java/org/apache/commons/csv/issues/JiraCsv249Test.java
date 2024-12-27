@@ -31,9 +31,6 @@ import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
 
  class JiraCsv249Test {
-
-     private CSVParser parser;
-
      @Test
      void testJiraCsv249() throws IOException {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setEscape('\\').get();

@@ -51,8 +51,8 @@ import org.junit.jupiter.api.Test;
         // @formatter:on
         int lineCounter = 2;
         try (final CSVParser parser = CSVParser.builder().setReader(reader).setFormat(format).get()) {
-            for (final CSVRecord record : parser) {
-                assertNotNull(record);
+            for (final CSVRecord myRecord : parser) {
+                assertNotNull(myRecord);
                 assertEquals(lineCounter++, parser.getCurrentLineNumber());
             }
         }

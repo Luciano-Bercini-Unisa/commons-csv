@@ -1109,7 +1109,8 @@ class CSVPrinterTest {
 
     @Test
     void testNewCsvPrinterAppendableNullFormat() {
-        assertThrows(NullPointerException.class, () -> new CSVPrinter(new StringWriter(), null));
+        StringWriter stringWriter = new StringWriter();
+        assertThrows(NullPointerException.class, () -> new CSVPrinter(stringWriter, null));
     }
 
     @Test
@@ -1138,10 +1139,10 @@ class CSVPrinterTest {
         assertEquals("a,NULL,b" + recordSeparator, csvString);
         try (final CSVParser iterable = format.parse(new StringReader(csvString))) {
             final Iterator<CSVRecord> iterator = iterable.iterator();
-            final CSVRecord record = iterator.next();
-            assertEquals("a", record.get(0));
-            assertNull(record.get(1));
-            assertEquals("b", record.get(2));
+            final CSVRecord myRecord = iterator.next();
+            assertEquals("a", myRecord.get(0));
+            assertNull(myRecord.get(1));
+            assertEquals("b", myRecord.get(2));
             assertFalse(iterator.hasNext());
         }
     }
@@ -1439,8 +1440,8 @@ class CSVPrinterTest {
         try (final CSVPrinter printer = format.print(sw);
              final CSVParser parser = CSVParser.parse(code, format)) {
             assertInitialState(printer);
-            for (final CSVRecord record : parser) {
-                printer.printRecord(record);
+            for (final CSVRecord myRecord : parser) {
+                printer.printRecord(myRecord);
                 assertEquals(++row, printer.getRecordCount());
             }
             assertEquals(row, printer.getRecordCount());
@@ -1632,8 +1633,8 @@ class CSVPrinterTest {
         try (final CSVPrinter printer = format.print(sw);
              final CSVParser parser = CSVParser.parse(code, format)) {
             long count = 0;
-            for (final CSVRecord record : parser) {
-                printer.printRecord(record.stream());
+            for (final CSVRecord myRecord : parser) {
+                printer.printRecord(myRecord.stream());
                 assertEquals(++count, printer.getRecordCount());
             }
         }
@@ -1652,8 +1653,8 @@ class CSVPrinterTest {
         try (final CSVParser parser = CSVFormat.DEFAULT.parse(new StringReader(rowData));
              final CSVPrinter printer = CSVFormat.INFORMIX_UNLOAD.print(charArrayWriter)) {
             long count = 0;
-            for (final CSVRecord record : parser) {
-                printer.printRecord(record);
+            for (final CSVRecord myRecord : parser) {
+                printer.printRecord(myRecord);
                 assertEquals(++count, printer.getRecordCount());
             }
         }

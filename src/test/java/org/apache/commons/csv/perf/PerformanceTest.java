@@ -73,11 +73,11 @@ public class PerformanceTest {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setIgnoreSurroundingSpaces(false).get();
         long recordCount = 0;
         try (final CSVParser parser = format.parse(reader)) {
-            for (final CSVRecord record : parser) {
+            for (final CSVRecord myRecord : parser) {
                 recordCount++;
                 if (traverseColumns) {
                     for (@SuppressWarnings("unused")
-                    final String value : record) {
+                    final String value : myRecord) {
                         // do nothing for now
                     }
                 }

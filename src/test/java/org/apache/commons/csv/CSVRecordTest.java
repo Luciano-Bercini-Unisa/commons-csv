@@ -58,7 +58,7 @@ class CSVRecordTest {
     }
 
     private Map<String, Integer> headerMap;
-    private CSVRecord record, recordWithHeader;
+    private CSVRecord myRecord, recordWithHeader;
     private String[] values;
 
     @BeforeEach
@@ -66,7 +66,7 @@ class CSVRecordTest {
         values = new String[] { "A", "B", "C" };
         final String rowData = StringUtils.join(values, ',');
         try (final CSVParser parser = CSVFormat.DEFAULT.parse(new StringReader(rowData))) {
-            record = parser.iterator().next();
+            myRecord = parser.iterator().next();
         }
         try (final CSVParser parser = CSVFormat.DEFAULT.builder().setHeader(EnumHeader.class).get().parse(new StringReader(rowData))) {
             recordWithHeader = parser.iterator().next();
@@ -89,11 +89,11 @@ class CSVRecordTest {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().get();
 
         try (final CSVParser parser = CSVParser.parse(csv, format)) {
-            final CSVRecord record = parser.nextRecord();
+            final CSVRecord myRecord = parser.nextRecord();
 
             assertAll("Test that it gets the last instance of a column when there are duplicate headings",
-                () -> assertEquals("2", record.get("A")),
-                () -> assertEquals("6", record.get("B"))
+                () -> assertEquals("2", myRecord.get("A")),
+                () -> assertEquals("6", myRecord.get("B"))
             );
         }
     }
@@ -104,8 +104,8 @@ class CSVRecordTest {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().get();
 
         try (final CSVParser parser = CSVParser.parse(csv, format)) {
-            final CSVRecord record = parser.nextRecord();
-            final Map<String, String> map = record.toMap();
+            final CSVRecord myRecord = parser.nextRecord();
+            final Map<String, String> map = myRecord.toMap();
 
             assertAll("Test that it gets the last instance of a column when there are duplicate headings",
                 () -> assertEquals("2", map.get("A")),
@@ -116,9 +116,9 @@ class CSVRecordTest {
 
     @Test
      void testGetInt() {
-        assertEquals(values[0], record.get(0));
-        assertEquals(values[1], record.get(1));
-        assertEquals(values[2], record.get(2));
+        assertEquals(values[0], myRecord.get(0));
+        assertEquals(values[1], myRecord.get(1));
+        assertEquals(values[2], myRecord.get(2));
     }
 
     @Test
@@ -141,7 +141,7 @@ class CSVRecordTest {
 
     @Test
      void testGetStringNoHeader() {
-        assertThrows(IllegalStateException.class, () -> record.get("first"));
+        assertThrows(IllegalStateException.class, () -> myRecord.get("first"));
     }
 
     @Test
@@ -151,7 +151,7 @@ class CSVRecordTest {
 
     @Test
      void testGetUnmappedName() {
-        assertThrows(IllegalArgumentException.class, () -> assertNull(recordWithHeader.get("fourth")));
+        assertThrows(IllegalArgumentException.class, () -> recordWithHeader.get("fourth"));
     }
 
     @Test
@@ -173,7 +173,7 @@ class CSVRecordTest {
 
     @Test
      void testIsConsistent() {
-        assertTrue(record.isConsistent());
+        assertTrue(myRecord.isConsistent());
         assertTrue(recordWithHeader.isConsistent());
         final Map<String, Integer> map = recordWithHeader.getParser().getHeaderMap();
         map.put("fourth", Integer.valueOf(4));
@@ -195,24 +195,24 @@ class CSVRecordTest {
 
     @Test
      void testIsMapped() {
-        assertFalse(record.isMapped("first"));
+        assertFalse(myRecord.isMapped("first"));
         assertTrue(recordWithHeader.isMapped(EnumHeader.FIRST.name()));
         assertFalse(recordWithHeader.isMapped("fourth"));
     }
 
     @Test
      void testIsSetInt() {
-        assertFalse(record.isSet(-1));
-        assertTrue(record.isSet(0));
-        assertTrue(record.isSet(2));
-        assertFalse(record.isSet(3));
+        assertFalse(myRecord.isSet(-1));
+        assertTrue(myRecord.isSet(0));
+        assertTrue(myRecord.isSet(2));
+        assertFalse(myRecord.isSet(3));
         assertTrue(recordWithHeader.isSet(1));
         assertFalse(recordWithHeader.isSet(1000));
     }
 
     @Test
      void testIsSetString() {
-        assertFalse(record.isSet("first"));
+        assertFalse(myRecord.isSet("first"));
         assertTrue(recordWithHeader.isSet(EnumHeader.FIRST.name()));
         assertFalse(recordWithHeader.isSet("DOES NOT EXIST"));
     }
@@ -220,7 +220,7 @@ class CSVRecordTest {
     @Test
      void testIterator() {
         int i = 0;
-        for (final String value : record) {
+        for (final String value : myRecord) {
             assertEquals(values[i], value);
             i++;
         }
@@ -287,7 +287,7 @@ class CSVRecordTest {
     @Test
      void testStream() {
         final AtomicInteger i = new AtomicInteger();
-        record.stream().forEach(value -> {
+        myRecord.stream().forEach(value -> {
             assertEquals(values[i.get()], value);
             i.incrementAndGet();
         });
@@ -296,7 +296,7 @@ class CSVRecordTest {
     @Test
      void testToListAdd() {
         final String[] expected = values.clone();
-        final List<String> list = record.toList();
+        final List<String> list = myRecord.toList();
         list.add("Last");
         assertEquals("Last", list.get(list.size() - 1));
         assertEquals(list.size(), values.length + 1);
@@ -306,7 +306,7 @@ class CSVRecordTest {
     @Test
      void testToListFor() {
         int i = 0;
-        for (final String value : record.toList()) {
+        for (final String value : myRecord.toList()) {
             assertEquals(values[i], value);
             i++;
         }
@@ -315,7 +315,7 @@ class CSVRecordTest {
     @Test
      void testToListForEach() {
         final AtomicInteger i = new AtomicInteger();
-        record.toList().forEach(e -> {
+        myRecord.toList().forEach(e -> {
             assertEquals(values[i.getAndIncrement()], e);
         });
     }
@@ -323,7 +323,7 @@ class CSVRecordTest {
     @Test
      void testToListSet() {
         final String[] expected = values.clone();
-        final List<String> list = record.toList();
+        final List<String> list = myRecord.toList();
         list.set(list.size() - 1, "Last");
         assertEquals("Last", list.get(list.size() - 1));
         assertEquals(list.size(), values.length);
