@@ -529,34 +529,37 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
         if (headerRecord != null) {
             // Track an occurrence of a null, empty or blank header.
             boolean observedMissing = false;
+            headerNames = new ArrayList<>(headerRecord.length);
             for (int i = 0; i < headerRecord.length; i++) {
-                final String header = headerRecord[i];
-                final boolean blankHeader = CSVFormat.isBlank(header);
-                if (blankHeader && !format.getAllowMissingColumnNames()) {
-                    throw new IllegalArgumentException(
-                            "A header name is missing in " + Arrays.toString(headerRecord));
-                }
-                final boolean containsHeader = blankHeader ? observedMissing : hdrMap.containsKey(header);
-                final DuplicateHeaderMode headerMode = format.getDuplicateHeaderMode();
-                final boolean duplicatesAllowed = headerMode == DuplicateHeaderMode.ALLOW_ALL;
-                final boolean emptyDuplicatesAllowed = headerMode == DuplicateHeaderMode.ALLOW_EMPTY;
-                if (containsHeader && !duplicatesAllowed && !(blankHeader && emptyDuplicatesAllowed)) {
-                    throw new IllegalArgumentException(
-                            String.format(
-                                    "The header contains a duplicate name: \"%s\" in %s. If this is valid then use CSVFormat.Builder.setDuplicateHeaderMode().",
-                                    header, Arrays.toString(headerRecord)));
-                }
-                observedMissing |= blankHeader;
-                if (header != null) {
-                    hdrMap.put(header, Integer.valueOf(i)); // N.B. Explicit (un)boxing is intentional
-                    if (headerNames == null) {
-                        headerNames = new ArrayList<>(headerRecord.length);
-                    }
-                    headerNames.add(header);
-                }
+                observedMissing = buildNameToIndexMap(observedMissing, headerRecord, i, hdrMap, headerNames);
             }
         }
         return headerNames;
+    }
+
+    private Boolean buildNameToIndexMap(Boolean observedMissing, String[] headerRecord, Integer index, Map<String, Integer> hdrMap, List<String> headerNames) {
+        final String header = headerRecord[index];
+        final boolean blankHeader = CSVFormat.isBlank(header);
+        if (blankHeader && !format.getAllowMissingColumnNames()) {
+            throw new IllegalArgumentException(
+                    "A header name is missing in " + Arrays.toString(headerRecord));
+        }
+        final boolean containsHeader = blankHeader ? observedMissing : hdrMap.containsKey(header);
+        final DuplicateHeaderMode headerMode = format.getDuplicateHeaderMode();
+        final boolean duplicatesAllowed = headerMode == DuplicateHeaderMode.ALLOW_ALL;
+        final boolean emptyDuplicatesAllowed = headerMode == DuplicateHeaderMode.ALLOW_EMPTY;
+        if (containsHeader && !duplicatesAllowed && !(blankHeader && emptyDuplicatesAllowed)) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "The header contains a duplicate name: \"%s\" in %s. If this is valid then use CSVFormat.Builder.setDuplicateHeaderMode().",
+                            header, Arrays.toString(headerRecord)));
+        }
+        observedMissing |= blankHeader;
+        if (header != null) {
+            hdrMap.put(header, Integer.valueOf(index)); // N.B. Explicit (un)boxing is intentional
+            headerNames.add(header);
+        }
+        return observedMissing;
     }
 
     /**
