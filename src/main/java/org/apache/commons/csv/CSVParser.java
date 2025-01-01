@@ -450,7 +450,6 @@ public final class CSVParser implements Iterable<CSVRecord>, Closeable {
      * @since 1.1
      * @deprecated Will be private in the next major version, use {@link Builder#get()}.
      */
-    @Deprecated
     @SuppressWarnings("resource")
     public CSVParser(final Reader reader, final CSVFormat format, final long characterOffset, final long recordNumber)
             throws IOException {

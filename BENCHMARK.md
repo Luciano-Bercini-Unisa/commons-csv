@@ -76,4 +76,4 @@ mvn test -Dtest=PerformanceTest
 Performance Test Harness
 -------------
 
-CSV offers a secondary performance test harness located at: `org.apache.commons.csv.PerformanceTest`
+CSV offers a secondary performance test harness located at: `org.apache.commons.csv.PerformanceBenchmark`

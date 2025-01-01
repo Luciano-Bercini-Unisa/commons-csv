@@ -815,6 +815,26 @@ public final class CSVFormat implements Serializable {
             this.trim = trim;
             return this;
         }
+
+        /**
+         * Returns true if the given character is a line break character.
+         *
+         * @param c the character to check.
+         * @return true if {@code c} is a line break character.
+         */
+        private boolean isLineBreak(final char c) {
+            return c == Constants.LF || c == Constants.CR;
+        }
+
+        /**
+         * Returns true if the given character is a line break character.
+         *
+         * @param c the character to check, may be null.
+         * @return true if {@code c} is a line break character (and not null).
+         */
+        private boolean isLineBreak(final Character c) {
+            return c != null && isLineBreak(c.charValue()); // N.B. Explicit (un)boxing is intentional
+        }
     }
 
     /**
@@ -1369,26 +1389,6 @@ public final class CSVFormat implements Serializable {
 
     static boolean isBlank(final String value) {
         return value == null || value.trim().isEmpty();
-    }
-
-    /**
-     * Returns true if the given character is a line break character.
-     *
-     * @param c the character to check.
-     * @return true if {@code c} is a line break character.
-     */
-    private static boolean isLineBreak(final char c) {
-        return c == Constants.LF || c == Constants.CR;
-    }
-
-    /**
-     * Returns true if the given character is a line break character.
-     *
-     * @param c the character to check, may be null.
-     * @return true if {@code c} is a line break character (and not null).
-     */
-    private static boolean isLineBreak(final Character c) {
-        return c != null && isLineBreak(c.charValue()); // N.B. Explicit (un)boxing is intentional
     }
 
     /**

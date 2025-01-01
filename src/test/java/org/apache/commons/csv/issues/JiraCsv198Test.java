@@ -39,7 +39,7 @@ class JiraCsv198Test {
     // @formatter:on
 
     @Test
-    void test() throws UnsupportedEncodingException, IOException {
+    void test() throws IOException {
         final InputStream pointsOfReference = getClass().getResourceAsStream("/org/apache/commons/csv/CSV-198/optd_por_public.csv");
         assertNotNull(pointsOfReference);
         try (@SuppressWarnings("resource")

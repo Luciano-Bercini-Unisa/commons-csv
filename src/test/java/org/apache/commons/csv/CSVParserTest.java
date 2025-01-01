@@ -31,6 +31,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -104,7 +105,7 @@ class CSVParserTest {
 
     // Format with explicit header that does not skip the header line
     // @formatter:off
-    CSVFormat FORMAT_EXPLICIT_HEADER_NO_SKIP = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+    CSVFormat formatExplicitHeaderNoSkip = CSVFormat.Builder.create(CSVFormat.DEFAULT)
             .setCommentMarker('#')
             .setHeader("A", "B")
             .get();
@@ -449,8 +450,14 @@ class CSVParserTest {
 
     @Test
     void testDuplicateHeadersNotAllowed() {
-        assertThrows(IllegalArgumentException.class,
-                () -> CSVParser.parse("a,b,a\n1,2,3\nx,y,z", CSVFormat.DEFAULT.builder().setHeader().get().builder().setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY).get()));
+        CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
+                .setHeader()
+                .get()
+                .builder()
+                .setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_EMPTY)
+                .get();
+        String input = "a,b,a\n1,2,3\nx,y,z";
+        assertThrows(IllegalArgumentException.class, () -> CSVParser.parse(input, csvFormat));
     }
 
     @Test
@@ -661,7 +668,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderComment_HeaderComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, formatExplicitHeaderNoSkip)) {
             parser.getRecords();
             // Expect no header comment - the text "comment" is attached to the first record
             assertFalse(parser.hasHeaderComment());
@@ -701,7 +708,7 @@ class CSVParserTest {
 
     @Test
     void testGetHeaderComment_NoComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_NO_COMMENT, formatExplicitHeaderNoSkip)) {
             parser.getRecords();
             // Expect no header comment
             assertFalse(parser.hasHeaderComment());
@@ -904,7 +911,7 @@ class CSVParserTest {
 
     @Test
     void testGetTrailerComment_HeaderComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_COMMENT, formatExplicitHeaderNoSkip)) {
             parser.getRecords();
             assertFalse(parser.hasTrailerComment());
             assertNull(parser.getTrailerComment());
@@ -931,7 +938,7 @@ class CSVParserTest {
 
     @Test
     void testGetTrailerComment_HeaderTrailerComment3() throws IOException {
-        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, FORMAT_EXPLICIT_HEADER_NO_SKIP)) {
+        try (CSVParser parser = CSVParser.parse(CSV_INPUT_HEADER_TRAILER_COMMENT, formatExplicitHeaderNoSkip)) {
             parser.getRecords();
             assertTrue(parser.hasTrailerComment());
             assertEquals("comment", parser.getTrailerComment());
@@ -1018,16 +1025,24 @@ class CSVParserTest {
 
     @Test
     void testHeadersMissingException() {
-        final Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setHeader().get().parse(in).iterator());
+        CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
+                .setHeader()
+                .get();
+        Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
+        assertThrows(IllegalArgumentException.class, () -> csvFormat.parse(in).iterator());
     }
-
+    
     @Test
     void testHeadersMissingOneColumnException() {
-        final Reader in = new StringReader("a,,c,d,e\n1,2,3,4,5\nv,w,x,y,z");
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setHeader().get().parse(in).iterator());
-    }
+        CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
+                .setHeader()
+                .get();
 
+        Reader in = new StringReader("a,,c,d,e\n1,2,3,4,5\nv,w,x,y,z");
+
+        assertThrows(IllegalArgumentException.class, () -> csvFormat.parse(in).iterator());
+    }
+    
     @Test
     void testHeadersWithNullColumnName() throws IOException {
         final Reader in = new StringReader("header1,null,header3\n1,2,3\n4,5,6");
@@ -1064,7 +1079,8 @@ class CSVParserTest {
 
     @Test
     void testInvalidFormat() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter(CR).get());
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setDelimiter(CR));
     }
 
     @Test
@@ -1222,7 +1238,7 @@ class CSVParserTest {
 
     @Test
     void testNewCSVParserNullReaderFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(null).setFormat(CSVFormat.DEFAULT).get());
+        assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(null));
     }
     
 
@@ -1316,17 +1332,21 @@ class CSVParserTest {
 
     @Test
     void testParseFileNullFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.parse(new File("CSVFileParser/test.csv"), Charset.defaultCharset(), null));
+        File file = new File("CSVFileParser/test.csv");
+        Charset charset = Charset.defaultCharset();
+        assertThrows(NullPointerException.class, () -> CSVParser.parse(file, charset, null));
     }
 
     @Test
     void testParseNullFileFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.parse((File) null, Charset.defaultCharset(), CSVFormat.DEFAULT));
+        Charset charset = Charset.defaultCharset();
+        assertThrows(NullPointerException.class, () -> CSVParser.parse((File) null, charset, CSVFormat.DEFAULT));
     }
 
     @Test
     void testParseNullPathFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.parse((Path) null, Charset.defaultCharset(), CSVFormat.DEFAULT));
+        Charset charset = Charset.defaultCharset();
+        assertThrows(NullPointerException.class, () -> CSVParser.parse((Path) null, charset, CSVFormat.DEFAULT));
     }
 
     @Test
@@ -1336,7 +1356,8 @@ class CSVParserTest {
 
     @Test
     void testParseNullUrlCharsetFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.parse((URL) null, Charset.defaultCharset(), CSVFormat.DEFAULT));
+        Charset charset = Charset.defaultCharset();
+        assertThrows(NullPointerException.class, () -> CSVParser.parse((URL) null, charset, CSVFormat.DEFAULT));
     }
 
     @Test
@@ -1350,8 +1371,10 @@ class CSVParserTest {
     }
 
     @Test
-    void testParseUrlCharsetNullFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.parse(new URL("https://commons.apache.org"), Charset.defaultCharset(), null));
+    void testParseUrlCharsetNullFormat() throws MalformedURLException {
+        URL url = new URL("https://commons.apache.org");
+        Charset charset = Charset.defaultCharset();
+        assertThrows(NullPointerException.class, () -> CSVParser.parse(url, charset, null));
     }
 
     @Test
@@ -1743,7 +1766,8 @@ class CSVParserTest {
             assertEquals(code.indexOf('\u00c4'), myRecord.getCharacterPosition());
             assertEquals("\u00c4", myRecord.get(0));
         } // again with ctor
-        try (CSVParser parser = new CSVParser(new StringReader(code.substring((int) positionRecord3)), format, positionRecord3, 3)) {
+        try (CSVParser parser = CSVParser.builder().setReader(new StringReader(code.substring((int) positionRecord3))).
+                setFormat(format).setCharacterOffset(positionRecord3).setRecordNumber(3).get()) {
             CSVRecord myRecord;
             // nextRecord
             assertNotNull(myRecord = parser.nextRecord());

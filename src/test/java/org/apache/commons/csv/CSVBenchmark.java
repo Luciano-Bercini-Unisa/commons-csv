@@ -195,7 +195,7 @@ public class CSVBenchmark {
     }
 
     @Benchmark
-    public int scan(final Blackhole bh) throws Exception {
+    public int scan(final Blackhole bh) {
         int count = 0;
 
         try (Scanner scanner = new Scanner(getReader())) {

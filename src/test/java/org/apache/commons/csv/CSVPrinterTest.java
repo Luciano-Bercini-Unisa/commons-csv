@@ -66,9 +66,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests {@link CSVPrinter}.
@@ -574,16 +571,6 @@ class CSVPrinterTest {
 
     @Test
     void testEscapeNull4() throws IOException {
-        final StringWriter sw = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(sw, CSVFormat.DEFAULT.builder().setEscape(null).get())) {
-            assertInitialState(printer);
-            printer.print("\\\\");
-        }
-        assertEquals("\\\\", sw.toString());
-    }
-
-    @Test
-    void testEscapeNull5() throws IOException {
         final StringWriter sw = new StringWriter();
         try (final CSVPrinter printer = new CSVPrinter(sw, CSVFormat.DEFAULT.builder().setEscape(null).get())) {
             assertInitialState(printer);
