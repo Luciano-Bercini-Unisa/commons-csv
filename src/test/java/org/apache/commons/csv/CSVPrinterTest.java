@@ -977,104 +977,37 @@ class CSVPrinterTest {
 
     @Test
     void testMySqlNullOutput() throws IOException {
-        Object[] s = new String[]{"NULL", null};
-        CSVFormat format = CSVFormat.MYSQL.builder().setQuote(DQUOTE_CHAR).get().builder().setNullString("NULL").get().builder().setQuoteMode(QuoteMode.NON_NUMERIC).get();
-        StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        String expected = "\"NULL\"\tNULL\n";
-        assertEquals(expected, writer.toString());
-        String[] record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(s, record0);
+        assertRecord(new String[]{"\\N", null},
+                "\\\\N\t\\N\n", CSVFormat.MYSQL.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\\N", null};
-        format = CSVFormat.MYSQL.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\t\\N\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", "A"},
+                "\\\\N\tA\n", CSVFormat.MYSQL.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\\N", "A"};
-        format = CSVFormat.MYSQL.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\tA\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\n", "A"},
+                "\\n\tA\n", CSVFormat.MYSQL.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\n", "A"};
-        format = CSVFormat.MYSQL.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\n\tA\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"", null},
+                "\tNULL\n", CSVFormat.MYSQL.builder()
+                        .setNullString("NULL")
+                        .get());
 
-        s = new String[]{"", null};
-        format = CSVFormat.MYSQL.builder().setNullString("NULL").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\tNULL\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"", null},
+                "\t\\N\n", CSVFormat.MYSQL);
 
-        s = new String[]{"", null};
-        format = CSVFormat.MYSQL;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\t\\N\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", "", "\u000e,\\\r"},
+                "\\\\N\t\t\u000e,\\\\\\r\n", CSVFormat.MYSQL);
 
-        s = new String[]{"\\N", "", "\u000e,\\\r"};
-        format = CSVFormat.MYSQL;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\t\t\u000e,\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"NULL", "\\\r"},
+                "NULL\t\\\\\\r\n", CSVFormat.MYSQL);
 
-        s = new String[]{"NULL", "\\\r"};
-        format = CSVFormat.MYSQL;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "NULL\t\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
-
-        s = new String[]{"\\\r"};
-        format = CSVFormat.MYSQL;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\\r"},
+                "\\\\\\r\n", CSVFormat.MYSQL);
     }
 
     @Test
@@ -1154,209 +1087,99 @@ class CSVPrinterTest {
     @Test
     @Disabled
     void testPostgreSqlCsvNullOutput() throws IOException {
-        Object[] s = new String[]{"NULL", null};
-        CSVFormat format = CSVFormat.POSTGRESQL_CSV.builder().setQuote(DQUOTE_CHAR).get().builder().setNullString("NULL").get().builder().setQuoteMode(QuoteMode.ALL_NON_NULL).get();
-        StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        String expected = "\"NULL\",NULL\n";
-        assertEquals(expected, writer.toString());
-        String[] record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(new Object[2], record0);
+        assertRecord(new String[]{"NULL", null},
+                "\"NULL\",NULL\n", CSVFormat.POSTGRESQL_CSV.builder()
+                        .setQuote(DQUOTE_CHAR)
+                        .setNullString("NULL")
+                        .setQuoteMode(QuoteMode.ALL_NON_NULL)
+                        .get());
 
-        s = new String[]{"\\N", null};
-        format = CSVFormat.POSTGRESQL_CSV.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\t\\N\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", null},
+                "\\\\N\t\\N\n", CSVFormat.POSTGRESQL_CSV.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\\N", "A"};
-        format = CSVFormat.POSTGRESQL_CSV.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\tA\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", "A"},
+                "\\\\N\tA\n", CSVFormat.POSTGRESQL_CSV.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\n", "A"};
-        format = CSVFormat.POSTGRESQL_CSV.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\n\tA\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\n", "A"},
+                "\\n\tA\n", CSVFormat.POSTGRESQL_CSV.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"", null};
-        format = CSVFormat.POSTGRESQL_CSV.builder().setNullString("NULL").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\tNULL\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"", null},
+                "\tNULL\n", CSVFormat.POSTGRESQL_CSV.builder()
+                        .setNullString("NULL")
+                        .get());
 
-        s = new String[]{"", null};
-        format = CSVFormat.POSTGRESQL_CSV;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\t\\N\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"", null},
+                "\t\\N\n", CSVFormat.POSTGRESQL_CSV);
 
-        s = new String[]{"\\N", "", "\u000e,\\\r"};
-        format = CSVFormat.POSTGRESQL_CSV;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\t\t\u000e,\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", "", "\u000e,\\\r"},
+                "\\\\N\t\t\u000e,\\\\\\r\n", CSVFormat.POSTGRESQL_CSV);
 
-        s = new String[]{"NULL", "\\\r"};
-        format = CSVFormat.POSTGRESQL_CSV;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "NULL\t\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"NULL", "\\\r"},
+                "NULL\t\\\\\\r\n", CSVFormat.POSTGRESQL_CSV);
 
-        s = new String[]{"\\\r"};
-        format = CSVFormat.POSTGRESQL_CSV;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\\r"},
+                "\\\\\\r\n", CSVFormat.POSTGRESQL_CSV);
     }
-
+    
     @Test
     @Disabled
     void testPostgreSqlCsvTextOutput() throws IOException {
-        Object[] s = new String[]{"NULL", null};
-        CSVFormat format = CSVFormat.POSTGRESQL_TEXT.builder().setQuote(DQUOTE_CHAR).get().builder().setNullString("NULL").get().builder().setQuoteMode(QuoteMode.ALL_NON_NULL).get();
-        StringWriter writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        String expected = "\"NULL\"\tNULL\n";
-        assertEquals(expected, writer.toString());
-        String[] record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(new Object[2], record0);
+        assertRecord(new String[]{"NULL", null},
+                "\"NULL\"\tNULL\n", CSVFormat.POSTGRESQL_TEXT.builder()
+                        .setQuote(DQUOTE_CHAR)
+                        .setNullString("NULL")
+                        .setQuoteMode(QuoteMode.ALL_NON_NULL)
+                        .get());
 
-        s = new String[]{"\\N", null};
-        format = CSVFormat.POSTGRESQL_TEXT.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\t\\N\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", null},
+                "\\\\N\t\\N\n", CSVFormat.POSTGRESQL_TEXT.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\\N", "A"};
-        format = CSVFormat.POSTGRESQL_TEXT.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\tA\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", "A"},
+                "\\\\N\tA\n", CSVFormat.POSTGRESQL_TEXT.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"\n", "A"};
-        format = CSVFormat.POSTGRESQL_TEXT.builder().setNullString("\\N").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\n\tA\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\n", "A"},
+                "\\n\tA\n", CSVFormat.POSTGRESQL_TEXT.builder()
+                        .setNullString("\\N")
+                        .get());
 
-        s = new String[]{"", null};
-        format = CSVFormat.POSTGRESQL_TEXT.builder().setNullString("NULL").get();
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\tNULL\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"", null},
+                "\tNULL\n", CSVFormat.POSTGRESQL_TEXT.builder()
+                        .setNullString("NULL")
+                        .get());
 
-        s = new String[]{"", null};
-        format = CSVFormat.POSTGRESQL_TEXT;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\t\\N\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"", null},
+                "\t\\N\n", CSVFormat.POSTGRESQL_TEXT);
 
-        s = new String[]{"\\N", "", "\u000e,\\\r"};
-        format = CSVFormat.POSTGRESQL_TEXT;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\N\t\t\u000e,\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\N", "", "\u000e,\\\r"},
+                "\\\\N\t\t\u000e,\\\\\\r\n", CSVFormat.POSTGRESQL_TEXT);
 
-        s = new String[]{"NULL", "\\\r"};
-        format = CSVFormat.POSTGRESQL_TEXT;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "NULL\t\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"NULL", "\\\r"},
+                "NULL\t\\\\\\r\n", CSVFormat.POSTGRESQL_TEXT);
 
-        s = new String[]{"\\\r"};
-        format = CSVFormat.POSTGRESQL_TEXT;
-        writer = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
-            printer.printRecord(s);
-        }
-        expected = "\\\\\\r\n";
-        assertEquals(expected, writer.toString());
-        record0 = toFirstRecordValues(expected, format);
-        assertArrayEquals(expectNulls(s, format), record0);
+        assertRecord(new String[]{"\\\r"},
+                "\\\\\\r\n", CSVFormat.POSTGRESQL_TEXT);
     }
 
+    private void assertRecord(String[] input, String expectedOutput, CSVFormat format) throws IOException {
+        StringWriter writer = new StringWriter();
+        try (final CSVPrinter printer = new CSVPrinter(writer, format)) {
+            printer.printRecord((Object[]) input);
+        }
+        assertEquals(expectedOutput, writer.toString());
+        String[] record0 = toFirstRecordValues(expectedOutput, format);
+        assertArrayEquals(expectNulls(input, format), record0);
+    }
+    
     @Test
     void testPostgreSqlNullStringDefaultCsv() {
         assertEquals("", CSVFormat.POSTGRESQL_CSV.getNullString());

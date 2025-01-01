@@ -89,11 +89,11 @@ class CSVRecordTest {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().get();
 
         try (final CSVParser parser = CSVParser.parse(csv, format)) {
-            final CSVRecord myRecord = parser.nextRecord();
+            final CSVRecord nextRecord = parser.nextRecord();
 
             assertAll("Test that it gets the last instance of a column when there are duplicate headings",
-                () -> assertEquals("2", myRecord.get("A")),
-                () -> assertEquals("6", myRecord.get("B"))
+                () -> assertEquals("2", nextRecord.get("A")),
+                () -> assertEquals("6", nextRecord.get("B"))
             );
         }
     }
@@ -104,8 +104,8 @@ class CSVRecordTest {
         final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().get();
 
         try (final CSVParser parser = CSVParser.parse(csv, format)) {
-            final CSVRecord myRecord = parser.nextRecord();
-            final Map<String, String> map = myRecord.toMap();
+            final CSVRecord nextRecord = parser.nextRecord();
+            final Map<String, String> map = nextRecord.toMap();
 
             assertAll("Test that it gets the last instance of a column when there are duplicate headings",
                 () -> assertEquals("2", map.get("A")),
