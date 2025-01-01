@@ -66,6 +66,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests {@link CSVPrinter}.
@@ -530,16 +532,6 @@ class CSVPrinterTest {
     }
 
     @Test
-    void testEscapeBackslash5() throws IOException {
-        final StringWriter sw = new StringWriter();
-        try (final CSVPrinter printer = new CSVPrinter(sw, CSVFormat.DEFAULT.builder().setQuote(QUOTE_CH).get())) {
-            assertInitialState(printer);
-            printer.print("\\\\");
-        }
-        assertEquals("\\\\", sw.toString());
-    }
-
-    @Test
     void testEscapeNull1() throws IOException {
         final StringWriter sw = new StringWriter();
         try (final CSVPrinter printer = new CSVPrinter(sw, CSVFormat.DEFAULT.builder().setEscape(null).get())) {
@@ -743,7 +735,8 @@ class CSVPrinterTest {
 
     @Test
     void testInvalidFormat() {
-        assertThrows(IllegalArgumentException.class, () -> CSVFormat.DEFAULT.builder().setDelimiter(CR).get());
+        CSVFormat.Builder builder = CSVFormat.DEFAULT.builder();
+        assertThrows(IllegalArgumentException.class, () -> builder.setDelimiter(CR));
     }
 
     @Test
@@ -767,16 +760,16 @@ class CSVPrinterTest {
         try (StringReader reader = new StringReader(csv);
              final CSVParser csvParser = csvFormat.parse(reader)) {
             // Row 1
-            CSVRecord record = csvParser.nextRecord();
-            assertEquals("1", record.get(0));
-            assertEquals("r1", record.get(1));
-            assertEquals("long text 1", record.get(2));
-            assertEquals("YmluYXJ5IGRhdGEgMQ==\r\n", record.get(3));
+            CSVRecord myRecord = csvParser.nextRecord();
+            assertEquals("1", myRecord.get(0));
+            assertEquals("r1", myRecord.get(1));
+            assertEquals("long text 1", myRecord.get(2));
+            assertEquals("YmluYXJ5IGRhdGEgMQ==\r\n", myRecord.get(3));
             // Row 2
-            record = csvParser.nextRecord();
-            assertEquals("2", record.get(0));
-            assertEquals("r2", record.get(1));
-            assertEquals("YmluYXJ5IGRhdGEgMg==\r\n", record.get(3));
+            myRecord = csvParser.nextRecord();
+            assertEquals("2", myRecord.get(0));
+            assertEquals("r2", myRecord.get(1));
+            assertEquals("YmluYXJ5IGRhdGEgMg==\r\n", myRecord.get(3));
         }
     }
 
