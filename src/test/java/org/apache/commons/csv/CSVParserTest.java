@@ -1029,7 +1029,7 @@ class CSVParserTest {
                 .setHeader()
                 .get();
         Reader in = new StringReader("a,,c,,e\n1,2,3,4,5\nv,w,x,y,z");
-        assertThrows(IllegalArgumentException.class, () -> csvFormat.parse(in).iterator());
+        assertThrows(IllegalArgumentException.class, () -> csvFormat.parse(in));
     }
     
     @Test
@@ -1037,10 +1037,8 @@ class CSVParserTest {
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
                 .setHeader()
                 .get();
-
         Reader in = new StringReader("a,,c,d,e\n1,2,3,4,5\nv,w,x,y,z");
-
-        assertThrows(IllegalArgumentException.class, () -> csvFormat.parse(in).iterator());
+        assertThrows(IllegalArgumentException.class, () -> csvFormat.parse(in));
     }
     
     @Test
@@ -1238,7 +1236,8 @@ class CSVParserTest {
 
     @Test
     void testNewCSVParserNullReaderFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.builder().setReader(null));
+        CSVParser.Builder builder = CSVParser.builder();
+        assertThrows(NullPointerException.class, () -> builder.setReader(null));
     }
     
 
@@ -1361,8 +1360,9 @@ class CSVParserTest {
     }
 
     @Test
-    void testParserUrlNullCharsetFormat() {
-        assertThrows(NullPointerException.class, () -> CSVParser.parse(new URL("https://commons.apache.org"), null, CSVFormat.DEFAULT));
+    void testParserUrlNullCharsetFormat() throws MalformedURLException {
+        URL url = new URL("https://commons.apache.org");
+        assertThrows(NullPointerException.class, () -> CSVParser.parse(url, null, CSVFormat.DEFAULT));
     }
 
     @Test

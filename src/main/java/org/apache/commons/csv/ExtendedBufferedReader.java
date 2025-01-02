@@ -182,7 +182,7 @@ final class ExtendedBufferedReader extends UnsynchronizedBufferedReader {
             if (current == CR) {
                 final int next = peek();
                 if (next == LF) {
-                    read();
+                    int consumed = read();
                 }
             }
             if (current == EOF || current == LF || current == CR) {
