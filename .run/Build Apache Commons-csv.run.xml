@@ -12,7 +12,10 @@
           <option name="goals">
             <list>
               <option value="clean" />
-              <option value="install" />
+              <option value="verify" />
+              <option value="javadoc:javadoc" />
+              <option value="jacoco:report" />
+              <option value="org.pitest:pitest-maven:mutationCoverage" />
               <option value="-Drat.skip=true" />
             </list>
           </option>

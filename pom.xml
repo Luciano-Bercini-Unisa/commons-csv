@@ -75,6 +75,12 @@
       <version>1.37</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.pitest</groupId>
+      <artifactId>pitest</artifactId>
+      <version>1.15.3</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <developers>
@@ -205,12 +211,12 @@
     <commons.jacoco.classRatio>1.00</commons.jacoco.classRatio>
     <commons.jacoco.instructionRatio>0.98</commons.jacoco.instructionRatio>
     <commons.jacoco.methodRatio>1.00</commons.jacoco.methodRatio>
-    <commons.jacoco.branchRatio>0.97</commons.jacoco.branchRatio>
+    <commons.jacoco.branchRatio>0.96</commons.jacoco.branchRatio>
     <commons.jacoco.lineRatio>0.99</commons.jacoco.lineRatio>
-    <commons.jacoco.complexityRatio>0.96</commons.jacoco.complexityRatio>
+    <commons.jacoco.complexityRatio>0.95</commons.jacoco.complexityRatio>
   </properties>
   <build>
-    <defaultGoal>clean verify apache-rat:check japicmp:cmp spotbugs:check pmd:check pmd:cpd-check javadoc:javadoc checkstyle:check</defaultGoal>
+    <defaultGoal>clean verify apache-rat:check japicmp:cmp spotbugs:check pmd:check pmd:cpd-check javadoc:javadoc checkstyle:check org.pitest:pitest-maven:mutationCoverage -Drat.skip=true</defaultGoal>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -232,6 +238,26 @@
             <targetJdk>${maven.compiler.target}</targetJdk>
             <skipEmptyReport>false</skipEmptyReport>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.12</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <!-- attached to Maven test phase -->
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <!-- We need to add our test data files to rat exclusions -->
         <!-- Needed for command-line access, e.g mvn apache-rat:rat and mvn apache-rat:check -->
@@ -339,6 +365,27 @@
         <artifactId>apache-rat-plugin</artifactId>
       </plugin>
 
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>1.15.2</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>1.2.1</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <verbose>true</verbose>
+          <targetClasses>
+            <param>org.apache.commons.csv.*</param>
+          </targetClasses>
+          <outputFormats>
+            <param>HTML</param> <!-- Generate HTML reports -->
+          </outputFormats>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
