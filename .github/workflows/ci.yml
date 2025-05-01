@@ -35,4 +35,4 @@ jobs:
 
       # Step 4: Build with Maven.
       - name: Build and test
-        run: mvn clean install -Drat.skip=true
+        run: mvn clean install
