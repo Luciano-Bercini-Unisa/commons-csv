@@ -22,8 +22,6 @@ import static org.apache.commons.io.IOUtils.EOF;
 import java.io.Closeable;
 import java.io.IOException;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import javafx.util.Pair;
 import org.apache.commons.io.IOUtils;
 
 /**
