@@ -17,56 +17,35 @@
 
 package org.apache.commons.csv;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import org.apache.commons.io.IOUtils;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReaderBuilder;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.prefs.CsvPreference;
-
-import com.generationjava.io.CsvReader;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReaderBuilder;
-
 @BenchmarkMode(Mode.AverageTime)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms1024M", "-Xmx1024M"})
+@Fork(value = 1, jvmArgs = {"-server", "-Xms1024M", "-Xmx1024M"}) // 1024 MB heap size.
 @Threads(1)
 @Warmup(iterations = 5)
-@Measurement(iterations = 20)
+@Measurement(iterations = 10)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 public class CSVBenchmark {
-
-    private static final class CountingReaderCallback implements org.skife.csv.ReaderCallback {
-        public int count;
-
-        @Override
-        public void onRow(final String[] fields) {
-            count++;
-        }
+    public static void main(String[] args) throws Exception {
+        org.openjdk.jmh.Main.main(args);
     }
-
+    
     private String data;
 
     private Reader getReader() {
@@ -95,22 +74,6 @@ public class CSVBenchmark {
             while (iter.hasNext()) {
                 count++;
                 iter.next();
-            }
-        }
-
-        bh.consume(count);
-        return count;
-    }
-
-    @Benchmark
-    public int parseGenJavaCSV(final Blackhole bh) throws Exception {
-        int count = 0;
-
-        try (final Reader in = getReader()) {
-            final CsvReader reader = new CsvReader(in);
-            reader.setFieldDelimiter(',');
-            while (reader.readLine() != null) {
-                count++;
             }
         }
 
@@ -151,20 +114,7 @@ public class CSVBenchmark {
         bh.consume(count);
         return count;
     }
-
-    @Benchmark
-    public int parseSkifeCSV(final Blackhole bh) throws Exception {
-        final org.skife.csv.CSVReader reader = new org.skife.csv.SimpleReader();
-        reader.setSeperator(',');
-        final CountingReaderCallback callback = new CountingReaderCallback();
-
-        try (final Reader in = getReader()) {
-          reader.parse(in, callback);
-        }
-
-        bh.consume(callback);
-        return callback.count;
-    }
+    
 
     @Benchmark
     public int parseSuperCSV(final Blackhole bh) throws Exception {

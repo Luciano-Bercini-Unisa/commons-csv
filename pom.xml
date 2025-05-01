@@ -81,6 +81,19 @@
       <version>1.15.3</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.11.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- For randoop as it uses junit 4: -->
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>5.11.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <developers>
@@ -291,6 +304,15 @@
               <exclude>src/test/resources/org/apache/commons/csv/CSVFileParser/testCSV246_checkWithNoComment.txt</exclude>
               <exclude>src/test/resources/org/apache/commons/csv/CSV-290/psql.csv</exclude>
               <exclude>src/test/resources/org/apache/commons/csv/CSV-290/psql.tsv</exclude>
+              <!-- These are the new files (Luciano Bercini). -->
+              <exclude>.github/workflows/ci.yml</exclude>
+              <exclude>.run/Build Apache Commons-csv.run.xml</exclude>
+              <exclude>.srctestjavaorgapachecommonscsvrandoop*/**</exclude>
+              <exclude>RandoopClassList.txt</exclude>
+              <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest.java</exclude>
+              <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest0.java</exclude>
+              <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest1.java</exclude>
+              <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest2.java</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -377,7 +399,8 @@
           </dependency>
         </dependencies>
         <configuration>
-          <verbose>true</verbose>
+          <timeoutConstant>4000</timeoutConstant>
+          <timeoutFactor>2.0</timeoutFactor> <!-- Multiplier for timeouts based on test execution time -->
           <targetClasses>
             <param>org.apache.commons.csv.*</param>
           </targetClasses>
@@ -508,19 +531,6 @@
           <scope>test</scope>
         </dependency>
 
-        <!-- 
-             Not in Maven Central, download manually from http://kasparov.skife.org/csv/csv-1.0.jar and install with:
-             mkdir C:\Java\skife.org\
-             curl https://repo.marketcetera.org/maven/org/skife/kasparov/csv/1.0/csv-1.0.jar -o C:\Java\skife.org\csv-1.0.jar
-             mvn install:install-file -Dfile=C:/Java/skife.org/csv-1.0.jar -DgroupId=org.skife.kasparov -DartifactId=csv -Dversion=1.0 -Dpackaging=jar 
-         -->
-        <dependency>
-          <groupId>org.skife.kasparov</groupId>
-          <artifactId>csv</artifactId>
-          <version>1.0</version>
-          <scope>provided</scope>
-        </dependency>
-
         <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
@@ -535,6 +545,51 @@
 
       <build>
         <plugins>
+          <!-- OWASP Dependency-Check. -->
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <version>6.5.3</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <format>HTML</format>
+              <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory>
+            </configuration>
+          </plugin>
+          <!-- FindSecBugs. -->
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.0</version>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>spotbugs</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <xmlOutput>true</xmlOutput>
+              <htmlOutput>true</htmlOutput>
+              <failOnError>false</failOnError>
+              <outputDirectory>${project.build.directory}/spotbugs-report</outputDirectory>
+              <plugins>
+                <plugin>
+                  <groupId>com.h3xstream.findsecbugs</groupId>
+                  <artifactId>findsecbugs-plugin</artifactId>
+                  <version>1.12.0</version>
+                </plugin>
+              </plugins>
+            </configuration>
+          </plugin>
+
           <!-- Enable the compilation of the benchmarks -->
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>

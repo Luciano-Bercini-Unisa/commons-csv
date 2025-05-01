@@ -188,7 +188,7 @@ class CSVParserTest {
     }
 
     @Test
-    @Disabled
+    @Disabled("Disabled without reason – needs investigation (inherited test)")
     void testBackslashEscapingOld() throws IOException {
         final String code = "one,two,three\n" + "on\\\"e,two\n" + "on\"e,two\n" + "one,\"tw\\\"o\"\n" + "one,\"t\\,wo\"\n" + "one,two,\"th,ree\"\n" +
                 "\"a\\\\\"\n" + "a\\,b\n" + "\"a\\\\,b\"";
@@ -1198,7 +1198,7 @@ class CSVParserTest {
     }
 
     @Test
-    @Disabled
+    @Disabled("Disabled without reason – needs investigation (inherited test)")
     void testMongoDbCsv() throws Exception {
         try (final CSVParser parser = CSVParser.parse("\"a a\",b,c" + LF + "d,e,f", CSVFormat.MONGODB_CSV)) {
             final Iterator<CSVRecord> itr1 = parser.iterator();
@@ -1600,7 +1600,7 @@ class CSVParserTest {
     }
 
     @Test
-    @Disabled
+    @Disabled("Disabled without reason – needs investigation (inherited test)")
     void testStartWithEmptyLinesThenHeaders() throws Exception {
         final String[] codes = {"\r\n\r\n\r\nhello,\r\n\r\n\r\n", "hello,\n\n\n", "hello,\"\"\r\n\r\n\r\n", "hello,\"\"\n\n\n"};
         final String[][] res = {{"hello", ""}, {""}, // Excel format does not ignore empty lines
