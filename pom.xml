@@ -306,9 +306,11 @@
               <exclude>src/test/resources/org/apache/commons/csv/CSV-290/psql.tsv</exclude>
               <!-- These are the new files (Luciano Bercini). -->
               <exclude>.github/workflows/ci.yml</exclude>
+              <exclude>.github/workflows/docker.yml</exclude>
               <exclude>.run/Build Apache Commons-csv.run.xml</exclude>
               <exclude>.srctestjavaorgapachecommonscsvrandoop*/**</exclude>
               <exclude>RandoopClassList.txt</exclude>
+              <exclude>Dockerfile</exclude>
               <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest.java</exclude>
               <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest0.java</exclude>
               <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest1.java</exclude>
