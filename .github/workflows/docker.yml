@@ -36,4 +36,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: yourdockerhubusername/commons-csv:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/commons-csv:latest
