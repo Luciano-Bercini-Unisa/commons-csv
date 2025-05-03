@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Implementation-Title: Apache Commons CSV
+Bundle-Description: The Apache Commons CSV library provides a simple i
+ nterface for reading and writing CSV files of various types.
+Automatic-Module-Name: org.apache.commons.csv
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-SymbolicName: org.apache.commons.commons-csv
+Implementation-Version: 1.13.0-SNAPSHOT
+Specification-Vendor: The Apache Software Foundation
+Bundle-ManifestVersion: 2
+Specification-Title: Apache Commons CSV
+Bundle-DocURL: https://commons.apache.org/proper/commons-csv/
+Bundle-Vendor: The Apache Software Foundation
+Include-Resource: META-INF/LICENSE.txt=LICENSE.txt,META-INF/NOTICE.txt
+ =NOTICE.txt
+Import-Package: org.apache.commons.codec.binary;version="1.17.1",org.a
+ pache.commons.io;version="2.18.0",org.apache.commons.io.build;version
+ ="2.18.0",org.apache.commons.io.function;version="2.18.0",org.apache.
+ commons.io.input;version="2.18.0",org.apache.commons.io.output;versio
+ n="2.18.0",io.javalin,io.javalin.core,io.javalin.http
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-6.4.1.202306080939
+Implementation-Vendor: The Apache Software Foundation
+Export-Package: org.apache.commons.csv;version="1.13.0.SNAPSHOT"
+Bundle-Name: Apache Commons CSV
+Bundle-Version: 1.13.0.SNAPSHOT
+Private-Package: csvdemo
+Build-Jdk-Spec: 1.8
+Created-By: Apache Maven Bundle Plugin 5.1.9
+Specification-Version: 1.13
+
