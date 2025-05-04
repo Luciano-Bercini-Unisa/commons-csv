@@ -339,11 +339,9 @@
                             <exclude>.srctestjavaorgapachecommonscsvrandoop*/**</exclude>
                             <exclude>RandoopClassList.txt</exclude>
                             <exclude>Dockerfile</exclude>
-                            <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest.java</exclude>
-                            <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest0.java</exclude>
-                            <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest1.java</exclude>
-                            <exclude>src/test/java/org/apache/commons/csv/randoop/RegressionTest2.java</exclude>
+                            <exclude>src/test/java/org/apache/commons/csv/randoop/*</exclude>
                             <exclude>src/main/java/csvdemo/CsvApp.java</exclude>
+                            <exclude>.run/*</exclude>
                         </excludes>
                     </configuration>
                 </plugin>
